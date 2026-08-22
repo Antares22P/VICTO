@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
-import { useMap } from "react-leaflet";
+import { useMap, useMapEvents } from "react-leaflet";
+import { divIcon } from "leaflet";
 
 import {
   MapContainer,
@@ -7,15 +8,95 @@ import {
   Marker,
   Popup,
   Polyline,
-  useMapEvents,
 } from "react-leaflet";
 
 import { ref, onValue } from "firebase/database";
 import { database } from "./firebase";
 
 import "leaflet/dist/leaflet.css";
+import "./room.css";
+
+import BottomSection from "./BottomSection";
 
 const API_URL = import.meta.env.VITE_API_URL;
+
+// ======================================================
+// AVATAR
+// ======================================================
+
+function getInitialAvatar(name) {
+  const emojis = [
+    "😀",
+    "😎",
+    "🤖",
+    "👽",
+    "🦊",
+    "🐼",
+    "🐯",
+    "🐸",
+    "🦁",
+    "🐵",
+    "🐨",
+    "🐙",
+    "🦄",
+    "🐲",
+    "👻",
+  ];
+
+  if (!name) {
+    return emojis[0];
+  }
+
+  let hash = 0;
+
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+
+  return emojis[Math.abs(hash) % emojis.length];
+}
+
+// ======================================================
+// MEMBER AVATAR
+// ======================================================
+
+function MemberAvatar({ member, size = 34 }) {
+  const avatarStyle = {
+    width: `${size}px`,
+    height: `${size}px`,
+    borderRadius: "50%",
+    flexShrink: 0,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    overflow: "hidden",
+    background: "#202938",
+    border: "1px solid #374151",
+    fontSize: `${size * 0.5}px`,
+  };
+
+  if (member?.profileImage) {
+    return (
+      <div style={avatarStyle}>
+        <img
+          src={member.profileImage}
+          alt={member.name || "Member"}
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+          }}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div style={avatarStyle}>
+      {getInitialAvatar(member?.name)}
+    </div>
+  );
+}
 
 // ======================================================
 // MAP CLICK HANDLER
@@ -34,14 +115,24 @@ function MapClickHandler({ onSelect }) {
   return null;
 }
 
-function RecenterMap({ members, memberId }) {
+// ======================================================
+// RECENTER / FOLLOW MAP
+// ======================================================
+
+function RecenterMap({ members, memberId, followMe }) {
   const map = useMap();
   const hasCentered = useRef(false);
+
+  // ----------------------------------------------------
+  // FIRST LOCATION CENTER
+  // ----------------------------------------------------
 
   useEffect(() => {
     const me = members[memberId];
 
-    if (!me?.location) return;
+    if (!me?.location) {
+      return;
+    }
 
     const lat = Number(me.location.lat);
     const lng = Number(me.location.lng);
@@ -50,72 +141,378 @@ function RecenterMap({ members, memberId }) {
       return;
     }
 
-    // Center only the first time
     if (!hasCentered.current) {
-      map.setView([lat, lng], 15);
-      hasCentered.current = true;
+      const timer = setTimeout(() => {
+        if (!map || !map.getContainer()) {
+          return;
+        }
+
+        map.setView([lat, lng], 15, {
+          animate: false,
+        });
+
+        hasCentered.current = true;
+      }, 100);
+
+      return () => {
+        clearTimeout(timer);
+      };
     }
   }, [members, memberId, map]);
+
+  // ----------------------------------------------------
+  // FOLLOW MY LOCATION
+  // ----------------------------------------------------
+
+  useEffect(() => {
+    if (!followMe) {
+      return;
+    }
+
+    const me = members[memberId];
+
+    if (!me?.location) {
+      return;
+    }
+
+    const lat = Number(me.location.lat);
+    const lng = Number(me.location.lng);
+
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+      return;
+    }
+
+    if (!map || !map.getContainer()) {
+      return;
+    }
+
+    map.setView([lat, lng], map.getZoom(), {
+      animate: true,
+    });
+  }, [members, memberId, followMe, map]);
+
+  // ----------------------------------------------------
+  // MY LOCATION BUTTON
+  // ----------------------------------------------------
+
+  useEffect(() => {
+    const handleRecenter = (event) => {
+      const { lat, lng } = event.detail || {};
+
+      if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+        return;
+      }
+
+      if (!map || !map.getContainer()) {
+        return;
+      }
+
+      map.flyTo([lat, lng], 16, {
+        duration: 0.8,
+      });
+    };
+
+    window.addEventListener("victo-recenter", handleRecenter);
+
+    return () => {
+      window.removeEventListener("victo-recenter", handleRecenter);
+    };
+  }, [map]);
 
   return null;
 }
 
-function MyLocationButton({ members, memberId }) {
-  const map = useMap();
+// ======================================================
+// DISTANCE CALCULATION
+// ======================================================
 
-  const goToMyLocation = () => {
-    const me = members[memberId];
+function getDistanceMeters(lat1, lng1, lat2, lng2) {
+  const toRadians = (value) => (value * Math.PI) / 180;
 
-    if (!me?.location) {
-      alert("Your location is not available yet.");
-      return;
-    }
+  const earthRadius = 6371000;
 
-    const lat = Number(me.location.lat);
-    const lng = Number(me.location.lng);
+  const dLat = toRadians(lat2 - lat1);
+  const dLng = toRadians(lng2 - lng1);
 
-    if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
-      alert("Your location is not available yet.");
-      return;
-    }
-
-    map.flyTo([lat, lng], 16, {
-      duration: 1,
-    });
-  };
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRadians(lat1)) *
+      Math.cos(toRadians(lat2)) *
+      Math.sin(dLng / 2) ** 2;
 
   return (
-    <button
-      onClick={goToMyLocation}
-      style={{
-        position: "absolute",
-        zIndex: 1000,
-        bottom: "30px",
-        right: "20px",
-        background: "white",
-        border: "none",
-        borderRadius: "8px",
-        padding: "10px 14px",
-        boxShadow: "0 2px 10px rgba(0,0,0,0.25)",
-        cursor: "pointer",
-        fontWeight: "bold",
-      }}
-    >
-      📍 My Location
-    </button>
+    2 *
+    earthRadius *
+    Math.atan2(
+      Math.sqrt(a),
+      Math.sqrt(1 - a)
+    )
   );
 }
+
+// ======================================================
+// NEARBY SOUND
+// ======================================================
+
+function playNearbySound() {
+  try {
+    const AudioContext =
+      window.AudioContext || window.webkitAudioContext;
+
+    if (!AudioContext) {
+      return;
+    }
+
+    const context = new AudioContext();
+
+    const playTone = () => {
+      const now = context.currentTime;
+
+      const oscillator = context.createOscillator();
+      const gain = context.createGain();
+
+      oscillator.type = "sine";
+
+      oscillator.frequency.setValueAtTime(880, now);
+
+      oscillator.frequency.exponentialRampToValueAtTime(
+        660,
+        now + 0.18
+      );
+
+      gain.gain.setValueAtTime(0.0001, now);
+
+      gain.gain.exponentialRampToValueAtTime(
+        0.18,
+        now + 0.02
+      );
+
+      gain.gain.exponentialRampToValueAtTime(
+        0.0001,
+        now + 0.22
+      );
+
+      oscillator.connect(gain);
+      gain.connect(context.destination);
+
+      oscillator.start(now);
+      oscillator.stop(now + 0.24);
+
+      oscillator.addEventListener("ended", () => {
+        context.close().catch(() => {});
+      });
+    };
+
+    if (context.state === "suspended") {
+      context
+        .resume()
+        .then(playTone)
+        .catch(() => {
+          context.close().catch(() => {});
+        });
+    } else {
+      playTone();
+    }
+  } catch (error) {
+    console.warn(
+      "Nearby notification sound could not play:",
+      error
+    );
+  }
+}
+
+// ======================================================
+// DESTINATION MARKER
+// ======================================================
+
+function DestinationMarker({
+  id,
+  member,
+  memberId,
+  onRemove,
+}) {
+  const markerRef = useRef(null);
+
+  const isOwnDestination = id === memberId;
+
+  const lat = Number(member?.destination?.lat);
+  const lng = Number(member?.destination?.lng);
+
+  // ----------------------------------------------------
+  // REMOVE BUTTON
+  // ----------------------------------------------------
+
+  useEffect(() => {
+    const marker = markerRef.current;
+
+    if (!marker) {
+      return;
+    }
+
+    const element = marker.getElement();
+
+    if (!element) {
+      return;
+    }
+
+    const button = element.querySelector(
+      ".victo-destination-remove"
+    );
+
+    if (!button || !isOwnDestination) {
+      return;
+    }
+
+    const handleRemove = (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      onRemove(id);
+    };
+
+    button.addEventListener("click", handleRemove);
+
+    return () => {
+      button.removeEventListener("click", handleRemove);
+    };
+  }, [id, isOwnDestination, onRemove]);
+
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+    return null;
+  }
+
+  const removeButton = isOwnDestination
+    ? `
+        <button
+          type="button"
+          class="victo-destination-remove"
+          title="Remove destination"
+          aria-label="Remove destination"
+        >
+          × Remove
+        </button>
+      `
+    : "";
+
+  const destinationTitle = isOwnDestination
+    ? "Your Destination"
+    : `${member.name}'s Destination`;
+
+  const icon = divIcon({
+    className: "victo-destination-icon-wrapper",
+
+    html: `
+      <div class="victo-destination-marker">
+
+        <div class="victo-destination-pin">
+          <div class="victo-destination-pin-inner"></div>
+        </div>
+
+        <div class="victo-destination-label">
+          ${destinationTitle}
+        </div>
+
+        ${removeButton}
+
+      </div>
+    `,
+
+    iconSize: [170, 82],
+
+    iconAnchor: [18, 38],
+  });
+
+  return (
+    <Marker
+      ref={markerRef}
+      position={[lat, lng]}
+      icon={icon}
+      eventHandlers={{
+        click(event) {
+          event.originalEvent?.stopPropagation();
+        },
+      }}
+    >
+      <Popup>
+        <div
+          style={{
+            minWidth: "150px",
+          }}
+        >
+          <b>{destinationTitle}</b>
+
+          <div
+            style={{
+              marginTop: "6px",
+              fontSize: "11px",
+              color: "#6b7280",
+              lineHeight: 1.5,
+            }}
+          >
+            {isOwnDestination
+              ? "Hover the destination marker to remove it."
+              : "Destination shared by this member."}
+          </div>
+
+          {isOwnDestination && (
+            <button
+              type="button"
+              onClick={(event) => {
+                event.stopPropagation();
+                onRemove(id);
+              }}
+              style={{
+                marginTop: "10px",
+                width: "100%",
+                border: "0",
+                borderRadius: "7px",
+                padding: "7px 9px",
+                background: "#ef4444",
+                color: "#fff",
+                fontWeight: 700,
+                cursor: "pointer",
+              }}
+            >
+              Remove Destination
+            </button>
+          )}
+        </div>
+      </Popup>
+    </Marker>
+  );
+}
+
 // ======================================================
 // ROOM
 // ======================================================
 
 function Room() {
-  const routeCache = useRef(new Map());
-  const [members, setMembers] = useState({});
-  const [selectedDestination, setSelectedDestination] = useState(null);
+  // ====================================================
+  // STATE
+  // ====================================================
 
-  const [routes, setRoutes] = useState([]);
-  const [loadingRoutes, setLoadingRoutes] = useState(false);
+  const [members, setMembers] = useState({});
+
+  const [selectedDestination, setSelectedDestination] =
+    useState(null);
+
+  const [followMe, setFollowMe] = useState(false);
+
+  const [selectedMemberId, setSelectedMemberId] =
+    useState(null);
+
+  const [selectedMemberRoute, setSelectedMemberRoute] =
+    useState(null);
+
+  const [loadingMemberRoute, setLoadingMemberRoute] =
+    useState(false);
+
+  const [nearbyNotification, setNearbyNotification] =
+    useState(null);
+
+  // Members currently inside 30m.
+  // Prevents repeated sounds on every Firebase update.
+  const nearbyMembersRef = useRef(new Set());
 
   // ====================================================
   // LOCAL STORAGE
@@ -130,7 +527,12 @@ function Room() {
   // INVITE LINK
   // ====================================================
 
-  const inviteLink = `${window.location.origin}/join/${roomCode}`;
+  const inviteLink =
+    `${window.location.origin}/join/${roomCode}`;
+
+  // ====================================================
+  // COPY INVITE LINK
+  // ====================================================
 
   const copyInviteLink = async () => {
     try {
@@ -144,18 +546,6 @@ function Room() {
     }
   };
 
-  const copyRoomCode = async () => {
-    try {
-      await navigator.clipboard.writeText(roomCode);
-
-      alert("Room code copied!");
-    } catch (error) {
-      console.error(error);
-
-      alert("Could not copy room code");
-    }
-  };
-
   // ====================================================
   // FIREBASE - LISTEN TO MEMBERS
   // ====================================================
@@ -166,7 +556,10 @@ function Room() {
       return;
     }
 
-    const membersRef = ref(database, `rooms/${roomId}/members`);
+    const membersRef = ref(
+      database,
+      `rooms/${roomId}/members`
+    );
 
     const unsubscribe = onValue(
       membersRef,
@@ -178,14 +571,133 @@ function Room() {
         setMembers(data);
       },
       (error) => {
-        console.error("Firebase listener error:", error);
-      },
+        console.error(
+          "Firebase listener error:",
+          error
+        );
+      }
     );
 
     return () => {
       unsubscribe();
     };
   }, [roomId]);
+
+  // ====================================================
+  // NEARBY MEMBER SOUND / NOTIFICATION
+  // ====================================================
+
+  useEffect(() => {
+    const me = members[memberId];
+
+    if (!me?.location) {
+      nearbyMembersRef.current = new Set();
+      return;
+    }
+
+    const myLat = Number(me.location.lat);
+    const myLng = Number(me.location.lng);
+
+    if (
+      !Number.isFinite(myLat) ||
+      !Number.isFinite(myLng)
+    ) {
+      return;
+    }
+
+    const currentlyNearby = new Set();
+
+    Object.entries(members).forEach(([id, member]) => {
+      if (
+        id === memberId ||
+        !member?.location
+      ) {
+        return;
+      }
+
+      const memberLat = Number(member.location.lat);
+      const memberLng = Number(member.location.lng);
+
+      if (
+        !Number.isFinite(memberLat) ||
+        !Number.isFinite(memberLng)
+      ) {
+        return;
+      }
+
+      const distance = getDistanceMeters(
+        myLat,
+        myLng,
+        memberLat,
+        memberLng
+      );
+
+      // ==================================================
+      // MEMBER IS WITHIN 30 METERS
+      // ==================================================
+
+      if (distance <= 30) {
+        currentlyNearby.add(id);
+
+        // Only trigger when entering
+        // the 30m radius.
+        if (!nearbyMembersRef.current.has(id)) {
+          const distanceText =
+            distance < 1
+              ? "less than 1 m"
+              : `${Math.round(distance)} m`;
+
+          setNearbyNotification({
+            id: `${id}-${Date.now()}`,
+            name: member.name || "A member",
+            distanceText,
+          });
+
+          playNearbySound();
+
+          // Browser notification only if
+          // permission has already been granted.
+          if (
+            "Notification" in window &&
+            Notification.permission === "granted"
+          ) {
+            try {
+              new Notification("Victo", {
+                body:
+                  `${member.name || "A member"} ` +
+                  `is ${distanceText} away from you.`,
+              });
+            } catch (error) {
+              console.warn(
+                "Browser notification failed:",
+                error
+              );
+            }
+          }
+        }
+      }
+    });
+
+    nearbyMembersRef.current = currentlyNearby;
+  }, [members, memberId]);
+
+  // ====================================================
+  // AUTO HIDE NEARBY NOTIFICATION
+  // ====================================================
+
+  useEffect(() => {
+    if (!nearbyNotification) {
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setNearbyNotification(null);
+    }, 4500);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [nearbyNotification]);
 
   // ====================================================
   // ONLINE STATUS
@@ -198,25 +710,36 @@ function Room() {
 
     const updateOnlineStatus = async () => {
       try {
-        await fetch(
+        const response = await fetch(
           `${API_URL}/api/member/status` +
             `?roomId=${encodeURIComponent(roomId)}` +
             `&memberId=${encodeURIComponent(memberId)}` +
             `&online=true`,
           {
             method: "POST",
-          },
+          }
         );
+
+        if (!response.ok) {
+          console.error(
+            "Online status error:",
+            response.status
+          );
+        }
       } catch (error) {
-        console.error("Heartbeat failed:", error);
+        console.error(
+          "Heartbeat failed:",
+          error
+        );
       }
     };
 
-    // Immediately mark online
     updateOnlineStatus();
 
-    // Then every 10 seconds
-    const interval = setInterval(updateOnlineStatus, 10000);
+    const interval = setInterval(
+      updateOnlineStatus,
+      10000
+    );
 
     return () => {
       clearInterval(interval);
@@ -233,59 +756,73 @@ function Room() {
     }
 
     if (!navigator.geolocation) {
-      alert("Geolocation is not supported by your browser.");
+      alert(
+        "Geolocation is not supported by your browser."
+      );
 
       return;
     }
 
-    const watchId = navigator.geolocation.watchPosition(
-      async (position) => {
-        const location = {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-          updatedAt: Date.now(),
-        };
+    const watchId =
+      navigator.geolocation.watchPosition(
+        async (position) => {
+          const location = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+            updatedAt: Date.now(),
+          };
 
-        console.log("My location:", location);
+          console.log("My location:", location);
 
-        try {
-          const response = await fetch(
-            `${API_URL}/api/location` +
-              `?roomId=${encodeURIComponent(roomId)}` +
-              `&memberId=${encodeURIComponent(memberId)}`,
-            {
-              method: "POST",
+          try {
+            const response = await fetch(
+              `${API_URL}/api/location` +
+                `?roomId=${encodeURIComponent(roomId)}` +
+                `&memberId=${encodeURIComponent(memberId)}`,
+              {
+                method: "POST",
 
-              headers: {
-                "Content-Type": "application/json",
-              },
+                headers: {
+                  "Content-Type": "application/json",
+                },
 
-              body: JSON.stringify(location),
-            },
-          );
+                body: JSON.stringify(location),
+              }
+            );
 
-          if (!response.ok) {
-            console.error("Location API error:", await response.text());
+            if (!response.ok) {
+              console.error(
+                "Location API error:",
+                await response.text()
+              );
 
-            return;
+              return;
+            }
+
+            console.log(
+              "Location updated successfully"
+            );
+          } catch (error) {
+            console.error(
+              "Location update failed:",
+              error
+            );
           }
+        },
 
-          console.log("Location updated successfully");
-        } catch (error) {
-          console.error("Location update failed:", error);
+        (error) => {
+          console.error(
+            "GPS error:",
+            error
+          );
+        },
+
+        {
+          enableHighAccuracy: true,
+          maximumAge: 2000,
+          timeout: 10000,
         }
-      },
-
-      (error) => {
-        console.error("GPS error:", error);
-      },
-
-      {
-        enableHighAccuracy: true,
-        maximumAge: 2000,
-        timeout: 10000,
-      },
-    );
+      );
 
     return () => {
       navigator.geolocation.clearWatch(watchId);
@@ -315,18 +852,17 @@ function Room() {
 
           body: JSON.stringify({
             lat: selectedDestination.lat,
-
             lng: selectedDestination.lng,
-
-            name: name + "'s Destination",
-
+            name: `${name}'s Destination`,
             updatedAt: Date.now(),
           }),
-        },
+        }
       );
 
       if (!response.ok) {
-        throw new Error("Failed to save destination");
+        throw new Error(
+          "Failed to save destination"
+        );
       }
 
       console.log("Destination saved");
@@ -335,183 +871,209 @@ function Room() {
 
       setSelectedDestination(null);
     } catch (error) {
-      console.error("Destination error:", error);
+      console.error(
+        "Destination error:",
+        error
+      );
 
       alert("Could not set destination");
     }
   };
 
-  const removeDestination = async () => {
+  // ====================================================
+  // REMOVE SAVED DESTINATION
+  // ====================================================
+
+  const removeDestination = async (
+    destinationMemberId = memberId
+  ) => {
+    if (!roomId || !destinationMemberId) {
+      return;
+    }
+
+    // Only the owner can remove
+    // their destination.
+    if (destinationMemberId !== memberId) {
+      alert(
+        "You can only remove your own destination."
+      );
+
+      return;
+    }
+
     try {
       const response = await fetch(
         `${API_URL}/api/destination` +
           `?roomId=${encodeURIComponent(roomId)}` +
-          `&memberId=${encodeURIComponent(memberId)}`,
+          `&memberId=${encodeURIComponent(
+            destinationMemberId
+          )}`,
         {
           method: "DELETE",
-        },
+        }
       );
 
       if (!response.ok) {
-        throw new Error("Failed to remove destination");
+        throw new Error(
+          `Failed to remove destination: ${response.status}`
+        );
       }
 
-      alert("Destination removed!");
+      setSelectedDestination(null);
+
+      if (selectedMemberId === destinationMemberId) {
+        setSelectedMemberRoute(null);
+        setLoadingMemberRoute(false);
+      }
+
+      console.log("Destination removed");
     } catch (error) {
-      console.error("Remove destination error:", error);
-      alert("Could not remove destination");
+      console.error(
+        "Remove destination error:",
+        error
+      );
+
+      alert("Could not remove destination.");
     }
   };
 
   // ====================================================
-  // LOAD OSRM ROUTES
-  //
-  // EVERY MEMBER
-  //        ↓
-  // EVERY DESTINATION
+  // CANCEL DESTINATION
   // ====================================================
 
+  const cancelDestination = () => {
+    setSelectedDestination(null);
+  };
+
   // ====================================================
-  // LOAD OSRM ROUTES
-  //
-  // EVERY MEMBER
-  //        ↓
-  // EVERY DESTINATION
-  //
-  // Uses cache to avoid requesting OSRM unnecessarily
+  // SELECT MEMBER
   // ====================================================
 
-  useEffect(() => {
-    const membersWithLocation = Object.entries(members).filter(
-      ([_, member]) =>
-        member.location &&
-        member.location.lat != null &&
-        member.location.lng != null,
-    );
+  const selectMember = async (id) => {
+    // Clicking same member closes
+    // the selection.
+    if (selectedMemberId === id) {
+      setSelectedMemberId(null);
+      setSelectedMemberRoute(null);
+      setLoadingMemberRoute(false);
 
-    const destinations = Object.entries(members).filter(
-      ([_, member]) =>
-        member.destination &&
-        member.destination.lat != null &&
-        member.destination.lng != null,
-    );
-
-    if (membersWithLocation.length === 0 || destinations.length === 0) {
-      setRoutes([]);
       return;
     }
 
-    const loadRoutes = async () => {
-      setLoadingRoutes(true);
+    setSelectedMemberId(id);
+    setSelectedMemberRoute(null);
 
-      const newRoutes = [];
+    const member = members[id];
 
-      for (const [currentMemberId, member] of membersWithLocation) {
-        for (const [destinationMemberId, destinationOwner] of destinations) {
-          const start = member.location;
-          const end = destinationOwner.destination;
+    if (!member) {
+      return;
+    }
 
-          // Round GPS coordinates to reduce unnecessary
-          // OSRM requests caused by tiny GPS changes.
-          const startLat = Number(start.lat).toFixed(4);
-          const startLng = Number(start.lng).toFixed(4);
+    // --------------------------------------------------
+    // MEMBER LOCATION
+    // --------------------------------------------------
 
-          const endLat = Number(end.lat).toFixed(4);
-          const endLng = Number(end.lng).toFixed(4);
+    if (!member.location) {
+      return;
+    }
 
-          const cacheKey =
-            `${currentMemberId}-` +
-            `${destinationMemberId}-` +
-            `${startLat},${startLng}-` +
-            `${endLat},${endLng}`;
+    const startLat = Number(member.location.lat);
+    const startLng = Number(member.location.lng);
 
-          // ============================================
-          // CHECK CACHE
-          // ============================================
+    if (
+      !Number.isFinite(startLat) ||
+      !Number.isFinite(startLng)
+    ) {
+      return;
+    }
 
-          if (routeCache.current.has(cacheKey)) {
-            newRoutes.push(routeCache.current.get(cacheKey));
+    // --------------------------------------------------
+    // DESTINATION
+    // --------------------------------------------------
 
-            continue;
-          }
+    if (!member.destination) {
+      return;
+    }
 
-          try {
-            const url =
-              `https://router.project-osrm.org/route/v1/driving/` +
-              `${start.lng},${start.lat};` +
-              `${end.lng},${end.lat}` +
-              `?overview=full&geometries=geojson`;
+    const endLat = Number(member.destination.lat);
+    const endLng = Number(member.destination.lng);
 
-            const response = await fetch(url);
+    if (
+      !Number.isFinite(endLat) ||
+      !Number.isFinite(endLng)
+    ) {
+      return;
+    }
 
-            if (!response.ok) {
-              console.error("OSRM HTTP error:", response.status);
+    // --------------------------------------------------
+    // OSRM ROUTE
+    // --------------------------------------------------
 
-              continue;
-            }
+    setLoadingMemberRoute(true);
 
-            const data = await response.json();
+    try {
+      const url =
+        `https://router.project-osrm.org/route/v1/driving/` +
+        `${startLng},${startLat};` +
+        `${endLng},${endLat}` +
+        `?overview=full&geometries=geojson`;
 
-            if (!data.routes || data.routes.length === 0) {
-              console.log("No route found");
-              continue;
-            }
+      const response = await fetch(url);
 
-            const route = data.routes[0];
-
-            // OSRM = [lng, lat]
-            // Leaflet = [lat, lng]
-
-            const coordinates = route.geometry.coordinates.map(([lng, lat]) => [
-              lat,
-              lng,
-            ]);
-
-            const routeObject = {
-              id: `${currentMemberId}-${destinationMemberId}`,
-
-              memberId: currentMemberId,
-
-              destinationMemberId: destinationMemberId,
-
-              coordinates,
-
-              distance: route.distance,
-
-              duration: route.duration,
-            };
-
-            // ============================================
-            // SAVE TO CACHE
-            // ============================================
-
-            routeCache.current.set(cacheKey, routeObject);
-
-            newRoutes.push(routeObject);
-          } catch (error) {
-            console.error("OSRM error:", error);
-          }
-        }
+      if (!response.ok) {
+        throw new Error(
+          `OSRM HTTP error: ${response.status}`
+        );
       }
 
-      setRoutes(newRoutes);
+      const data = await response.json();
 
-      setLoadingRoutes(false);
-    };
+      if (
+        !data.routes ||
+        data.routes.length === 0
+      ) {
+        throw new Error("No route found");
+      }
 
-    loadRoutes();
-  }, [members]);
+      const route = data.routes[0];
+
+      const coordinates =
+        route.geometry.coordinates.map(
+          ([lng, lat]) => [lat, lng]
+        );
+
+      setSelectedMemberRoute({
+        memberId: id,
+        coordinates,
+        distance: route.distance,
+        duration: route.duration,
+      });
+    } catch (error) {
+      console.error(
+        "Selected member route error:",
+        error
+      );
+
+      setSelectedMemberRoute(null);
+    } finally {
+      setLoadingMemberRoute(false);
+    }
+  };
 
   // ====================================================
   // FORMAT DISTANCE
   // ====================================================
 
   const formatDistance = (meters) => {
-    if (meters < 1000) {
-      return Math.round(meters) + " m";
+    if (!Number.isFinite(meters)) {
+      return "--";
     }
 
-    return (meters / 1000).toFixed(2) + " km";
+    if (meters < 1000) {
+      return `${Math.round(meters)} m`;
+    }
+
+    return `${(meters / 1000).toFixed(2)} km`;
   };
 
   // ====================================================
@@ -519,10 +1081,14 @@ function Room() {
   // ====================================================
 
   const formatDuration = (seconds) => {
+    if (!Number.isFinite(seconds)) {
+      return "--";
+    }
+
     const minutes = Math.round(seconds / 60);
 
     if (minutes < 60) {
-      return minutes + " min";
+      return `${minutes} min`;
     }
 
     const hours = Math.floor(minutes / 60);
@@ -530,284 +1096,428 @@ function Room() {
     const remainingMinutes = minutes % 60;
 
     if (remainingMinutes === 0) {
-      return hours + " hr";
+      return `${hours} hr`;
     }
 
-    return hours + " hr " + remainingMinutes + " min";
+    return `${hours} hr ${remainingMinutes} min`;
   };
+
+  // ====================================================
+  // MY LOCATION
+  // ====================================================
+
+  const goToMyLocation = () => {
+    const me = members[memberId];
+
+    if (!me?.location) {
+      alert(
+        "Your location is not available yet."
+      );
+
+      return;
+    }
+
+    const lat = Number(me.location.lat);
+    const lng = Number(me.location.lng);
+
+    if (
+      !Number.isFinite(lat) ||
+      !Number.isFinite(lng)
+    ) {
+      alert(
+        "Your location is not available yet."
+      );
+
+      return;
+    }
+
+    window.dispatchEvent(
+      new CustomEvent("victo-recenter", {
+        detail: {
+          lat,
+          lng,
+        },
+      })
+    );
+  };
+
+  // ====================================================
+  // CURRENT SELECTED MEMBER
+  // ====================================================
+
+  const selectedMember = selectedMemberId
+    ? members[selectedMemberId]
+    : null;
 
   // ====================================================
   // RENDER
   // ====================================================
 
   return (
-    <div
-      style={{
-        width: "100vw",
-        height: "100vh",
-        position: "relative",
-      }}
-    >
+    <div className="room-app">
+
       {/* ==================================================
-          ROOM PANEL
+          NEARBY MEMBER NOTIFICATION
       ================================================== */}
 
-      <div
-        style={{
-          position: "absolute",
-          zIndex: 1000,
-          top: "20px",
-          left: "20px",
-
-          width: "280px",
-
-          background: "white",
-
-          padding: "15px 20px",
-
-          borderRadius: "10px",
-
-          boxShadow: "0 2px 10px rgba(0,0,0,0.2)",
-
-          maxHeight: "calc(100vh - 40px)",
-
-          overflowY: "auto",
-        }}
-      >
-        <h2
-          style={{
-            margin: "0 0 10px 0",
-          }}
-        >
-          Victo
-        </h2>
-
-        <div>
-          Room: <b>{roomCode}</b>
-        </div>
-
-        <div>
-          You: <b>{name}</b>
-        </div>
-
-        <div>
-          Members: <b>{Object.keys(members).length}</b>
-        </div>
-
-        {/* ==============================================
-    MEMBER LIST
-================================================ */}
-
+      {nearbyNotification && (
         <div
-          style={{
-            marginTop: "15px",
-            borderTop: "1px solid #ddd",
-            paddingTop: "10px",
-          }}
+          className="victo-nearby-notification"
+          role="status"
         >
-          <b>Members</b>
+          <div className="victo-nearby-notification-icon">
+            🔔
+          </div>
 
-          <div
-            style={{
-              marginTop: "8px",
-              display: "flex",
-              flexDirection: "column",
-              gap: "6px",
-            }}
+          <div>
+            <div className="victo-nearby-notification-title">
+              Member nearby
+            </div>
+
+            <div className="victo-nearby-notification-text">
+              <b>
+                {nearbyNotification.name}
+              </b>{" "}
+              is{" "}
+              {nearbyNotification.distanceText}{" "}
+              away.
+            </div>
+          </div>
+
+          <button
+            type="button"
+            className="victo-nearby-notification-close"
+            onClick={() =>
+              setNearbyNotification(null)
+            }
+            aria-label="Close notification"
           >
-            {Object.entries(members).map(([id, member]) => (
+            ×
+          </button>
+        </div>
+      )}
+
+      {/* ==================================================
+          TOP BAR
+      ================================================== */}
+
+      <div className="top-bar">
+        <div className="room-info">
+
+          <div className="room-brand">
+            Victo
+          </div>
+
+          <div className="room-detail">
+            Room:{" "}
+            <b>{roomCode}</b>
+          </div>
+
+          <div className="room-detail">
+            Members:{" "}
+            <b>
+              {Object.keys(members).length}
+            </b>
+          </div>
+
+        </div>
+      </div>
+
+      {/* ==================================================
+          MEMBERS PANEL
+      ================================================== */}
+
+      <div className="members-panel">
+
+        <div className="members-title">
+          MEMBERS
+        </div>
+
+        {Object.entries(members).map(
+          ([id, member]) => {
+            const isSelected =
+              id === selectedMemberId;
+
+            const hasDestination =
+              Boolean(member.destination);
+
+            return (
               <div
+                className="member-row"
                 key={id}
+                onClick={() =>
+                  selectMember(id)
+                }
                 style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  padding: "7px 8px",
-                  background: "#f5f5f5",
-                  borderRadius: "6px",
-                  fontSize: "13px",
+                  cursor: "pointer",
+                  borderRadius: "10px",
+                  padding: "8px",
+                  margin: "2px -8px",
+                  background: isSelected
+                    ? "rgba(99,102,241,0.14)"
+                    : "transparent",
+                  border: isSelected
+                    ? "1px solid rgba(99,102,241,0.3)"
+                    : "1px solid transparent",
+                  transition: "0.2s ease",
                 }}
               >
-                <span>
-                  {member.name}
+                <MemberAvatar
+                  member={member}
+                  size={34}
+                />
 
-                  {id === memberId && <b> (You)</b>}
-                </span>
+                <div
+                  style={{
+                    flex: 1,
+                    minWidth: 0,
+                  }}
+                >
+                  <div className="member-name">
+                    {member.name}
 
-                <span>
-                  {member.lastSeen &&
-                  Date.now() - Number(member.lastSeen) < 20000
-                    ? "🟢"
-                    : "🔴"}
-                </span>
+                    {id === memberId && (
+                      <span
+                        style={{
+                          marginLeft: "6px",
+                          fontSize: "10px",
+                          color: "#6366f1",
+                          fontWeight: 800,
+                        }}
+                      >
+                        YOU
+                      </span>
+                    )}
+                  </div>
+
+                  <div
+                    className="member-status"
+                    style={{
+                      color: member.online
+                        ? "#4ade80"
+                        : "#6b7280",
+                    }}
+                  >
+                    ●{" "}
+                    {member.online
+                      ? "Online"
+                      : "Offline"}
+                  </div>
+                </div>
+
+                {hasDestination && (
+                  <div
+                    style={{
+                      fontSize: "13px",
+                      opacity: 0.7,
+                    }}
+                    title="Destination set"
+                  >
+                    📍
+                  </div>
+                )}
               </div>
-            ))}
-          </div>
-        </div>
+            );
+          }
+        )}
 
-        {/* ==============================================
-            SHARE BUTTONS
-        ============================================== */}
+        {/* ==================================================
+            SELECTED MEMBER DETAILS
+        ================================================== */}
 
-        <div
-          style={{
-            marginTop: "12px",
-
-            display: "flex",
-
-            flexDirection: "column",
-
-            gap: "7px",
-          }}
-        >
-          <button
-            onClick={copyInviteLink}
-            style={{
-              padding: "9px",
-              cursor: "pointer",
-            }}
-          >
-            🔗 Copy Invite Link
-          </button>
-
-          <button
-            onClick={copyRoomCode}
-            style={{
-              padding: "9px",
-              cursor: "pointer",
-            }}
-          >
-            📋 Copy Room Code
-          </button>
-        </div>
-
-        {/* ==============================================
-            SET DESTINATION
-        ============================================== */}
-
-        {selectedDestination && (
+        {selectedMember && (
           <div
             style={{
               marginTop: "12px",
-              display: "flex",
-              flexDirection: "column",
-              gap: "7px",
+              paddingTop: "12px",
+              borderTop:
+                "1px solid rgba(255,255,255,0.08)",
             }}
           >
-            <button
-              onClick={saveDestination}
+            <div
               style={{
-                width: "100%",
-                padding: "9px",
-                cursor: "pointer",
+                fontSize: "10px",
+                fontWeight: 800,
+                letterSpacing: "1.2px",
+                color: "#8d98ad",
+                marginBottom: "8px",
               }}
             >
-              📍 Set Destination
-            </button>
+              SELECTED MEMBER
+            </div>
 
-            <button
-              onClick={() => setSelectedDestination(null)}
+            <div
               style={{
-                width: "100%",
-                padding: "9px",
-                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                gap: "9px",
+                marginBottom: "10px",
               }}
             >
-              ✕ Cancel
-            </button>
-          </div>
-        )}
+              <MemberAvatar
+                member={selectedMember}
+                size={38}
+              />
 
-        {members[memberId]?.destination && (
-          <button
-            onClick={removeDestination}
-            style={{
-              marginTop: "8px",
-              width: "100%",
-              padding: "9px",
-              cursor: "pointer",
-            }}
-          >
-            🗑️ Remove My Destination
-          </button>
-        )}
-
-        {/* ==============================================
-            ROUTES
-        ============================================== */}
-
-        {routes.length > 0 && (
-          <div
-            style={{
-              marginTop: "15px",
-
-              borderTop: "1px solid #ddd",
-
-              paddingTop: "10px",
-
-              maxHeight: "300px",
-
-              overflowY: "auto",
-            }}
-          >
-            <b>Routes</b>
-
-            {routes.map((route) => {
-              const member = members[route.memberId];
-
-              const destinationOwner = members[route.destinationMemberId];
-
-              if (!member || !destinationOwner) {
-                return null;
-              }
-
-              return (
+              <div>
                 <div
-                  key={route.id}
                   style={{
-                    marginTop: "8px",
-
-                    padding: "8px",
-
-                    border: "1px solid #ddd",
-
-                    borderRadius: "6px",
-
-                    fontSize: "13px",
+                    fontSize: "14px",
+                    fontWeight: 700,
                   }}
                 >
-                  <b>{member.name}</b>
-                  {" → "}
-                  <b>
-                    {destinationOwner.name}
-                    's destination
-                  </b>
-                  <br />
-                  📍 {formatDistance(route.distance)}
-                  <br />
-                  ⏱️ {formatDuration(route.duration)}
+                  {selectedMember.name}
                 </div>
-              );
-            })}
-          </div>
-        )}
 
-        {/* ==============================================
-            LOADING
-        ============================================== */}
+                <div
+                  style={{
+                    fontSize: "11px",
+                    color: selectedMember.online
+                      ? "#4ade80"
+                      : "#6b7280",
+                    marginTop: "2px",
+                  }}
+                >
+                  ●{" "}
+                  {selectedMember.online
+                    ? "Online"
+                    : "Offline"}
+                </div>
+              </div>
+            </div>
 
-        {loadingRoutes && (
-          <div
-            style={{
-              marginTop: "10px",
+            {loadingMemberRoute && (
+              <div
+                style={{
+                  fontSize: "12px",
+                  color: "#aab3c5",
+                  padding: "8px 0",
+                }}
+              >
+                Calculating route...
+              </div>
+            )}
 
-              fontSize: "13px",
-            }}
-          >
-            Loading routes...
+            {!loadingMemberRoute &&
+              !selectedMember.destination && (
+                <div
+                  style={{
+                    fontSize: "12px",
+                    color: "#8d98ad",
+                    lineHeight: 1.5,
+                  }}
+                >
+                  📍 No destination set
+                </div>
+              )}
+
+            {!loadingMemberRoute &&
+              selectedMemberRoute && (
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns:
+                      "1fr 1fr",
+                    gap: "7px",
+                  }}
+                >
+                  <div
+                    style={{
+                      padding: "9px",
+                      background:
+                        "rgba(255,255,255,0.05)",
+                      border:
+                        "1px solid rgba(255,255,255,0.07)",
+                      borderRadius: "8px",
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: "10px",
+                        color: "#8d98ad",
+                        marginBottom: "3px",
+                      }}
+                    >
+                      DISTANCE
+                    </div>
+
+                    <div
+                      style={{
+                        fontSize: "14px",
+                        fontWeight: 700,
+                      }}
+                    >
+                      {formatDistance(
+                        selectedMemberRoute.distance
+                      )}
+                    </div>
+                  </div>
+
+                  <div
+                    style={{
+                      padding: "9px",
+                      background:
+                        "rgba(255,255,255,0.05)",
+                      border:
+                        "1px solid rgba(255,255,255,0.07)",
+                      borderRadius: "8px",
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: "10px",
+                        color: "#8d98ad",
+                        marginBottom: "3px",
+                      }}
+                    >
+                      ETA
+                    </div>
+
+                    <div
+                      style={{
+                        fontSize: "14px",
+                        fontWeight: 700,
+                      }}
+                    >
+                      {formatDuration(
+                        selectedMemberRoute.duration
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
           </div>
         )}
       </div>
+
+      {/* ==================================================
+          BOTTOM SECTION
+      ================================================== */}
+
+      <BottomSection
+        followMe={followMe}
+        setFollowMe={setFollowMe}
+        goToMyLocation={goToMyLocation}
+        copyInviteLink={copyInviteLink}
+        selectedDestination={selectedDestination}
+        saveDestination={saveDestination}
+        cancelDestination={cancelDestination}
+      />
+
+      {/* ==================================================
+          TERRAIN BUTTON
+      ================================================== */}
+
+      <button
+        className="terrain-button"
+        onClick={() => {
+          alert(
+            "Terrain / Satellite mode will be added next."
+          );
+        }}
+      >
+        🗺 Terrain
+      </button>
 
       {/* ==================================================
           MAP
@@ -816,25 +1526,33 @@ function Room() {
       <MapContainer
         center={[22.5726, 88.3639]}
         zoom={13}
-        style={{
-          width: "100%",
-          height: "100%",
-        }}
+        className="room-map"
       >
-        <RecenterMap members={members} memberId={memberId} />
 
-        {/* ================================================
-            OPEN STREET MAP
-        ================================================ */}
+        {/* ----------------------------------------------
+            MAP CONTROLLERS
+        ---------------------------------------------- */}
 
-        <TileLayer
-          attribution="&copy; OpenStreetMap contributors"
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        <RecenterMap
+          members={members}
+          memberId={memberId}
+          followMe={followMe}
         />
 
-        {/* ================================================
+        {/* ----------------------------------------------
+            DARK MAP
+        ---------------------------------------------- */}
+
+        <TileLayer
+          attribution='&copy; OpenStreetMap contributors &copy; CARTO'
+          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+          subdomains="abcd"
+          maxZoom={20}
+        />
+
+        {/* ----------------------------------------------
             MAP CLICK
-        ================================================ */}
+        ---------------------------------------------- */}
 
         <MapClickHandler
           onSelect={(destination) => {
@@ -842,92 +1560,262 @@ function Room() {
           }}
         />
 
-        {/* ================================================
-            OSRM ROUTES
-        ================================================ */}
+        {/* ----------------------------------------------
+            SELECTED MEMBER ROUTE
+        ---------------------------------------------- */}
 
-        {routes.map((route) => (
-          <Polyline key={route.id} positions={route.coordinates} />
-        ))}
+        {selectedMemberRoute && (
+          <Polyline
+            positions={
+              selectedMemberRoute.coordinates
+            }
+            pathOptions={{
+              color: "#6366f1",
+              weight: 5,
+              opacity: 0.85,
+            }}
+          />
+        )}
 
-        {/* ================================================
+        {/* ----------------------------------------------
             MEMBER LOCATIONS
-        ================================================ */}
+        ---------------------------------------------- */}
 
-        {Object.entries(members).map(([id, member]) => {
-          if (!member.location) {
-            return null;
+        {Object.entries(members).map(
+          ([id, member]) => {
+            if (!member.location) {
+              return null;
+            }
+
+            const lat = Number(
+              member.location.lat
+            );
+
+            const lng = Number(
+              member.location.lng
+            );
+
+            if (
+              !Number.isFinite(lat) ||
+              !Number.isFinite(lng)
+            ) {
+              return null;
+            }
+
+            const isMe = id === memberId;
+
+            const avatarHtml =
+              member.profileImage
+                ? `
+                    <img
+                      src="${member.profileImage}"
+                      alt=""
+                      style="
+                        width:42px;
+                        height:42px;
+                        object-fit:cover;
+                        border-radius:50%;
+                        border:${
+                          isMe
+                            ? "3px solid #6366f1"
+                            : "3px solid white"
+                        };
+                        box-shadow:
+                          0 3px 12px
+                          rgba(0,0,0,0.35);
+                      "
+                    />
+                  `
+                : `
+                    <div
+                      style="
+                        width:42px;
+                        height:42px;
+                        display:flex;
+                        align-items:center;
+                        justify-content:center;
+                        border-radius:50%;
+                        background:#202938;
+                        border:${
+                          isMe
+                            ? "3px solid #6366f1"
+                            : "3px solid white"
+                        };
+                        box-shadow:
+                          0 3px 12px
+                          rgba(0,0,0,0.35);
+                        font-size:22px;
+                      "
+                    >
+                      ${getInitialAvatar(member.name)}
+                    </div>
+                  `;
+
+            return (
+              <Marker
+                key={`member-${id}`}
+                position={[lat, lng]}
+                icon={divIcon({
+                  className:
+                    "victo-member-marker",
+
+                  html: `
+                    <div
+                      style="
+                        width:42px;
+                        height:42px;
+                        position:relative;
+                      "
+                    >
+                      ${avatarHtml}
+
+                      <div
+                        style="
+                          position:absolute;
+                          right:-1px;
+                          bottom:-1px;
+                          width:11px;
+                          height:11px;
+                          border-radius:50%;
+                          background:${
+                            member.online
+                              ? "#22c55e"
+                              : "#6b7280"
+                          };
+                          border:
+                            2px solid white;
+                          box-sizing:border-box;
+                        "
+                      ></div>
+                    </div>
+                  `,
+
+                  iconSize: [42, 42],
+
+                  iconAnchor: [21, 21],
+                })}
+              >
+                <Popup>
+                  <div
+                    style={{
+                      minWidth: "120px",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
+                      }}
+                    >
+                      <MemberAvatar
+                        member={member}
+                        size={30}
+                      />
+
+                      <div>
+                        <b>
+                          {member.name}
+                          {isMe
+                            ? " (You)"
+                            : ""}
+                        </b>
+
+                        <div
+                          style={{
+                            fontSize: "11px",
+                            color:
+                              member.online
+                                ? "#16a34a"
+                                : "#6b7280",
+                          }}
+                        >
+                          ●{" "}
+                          {member.online
+                            ? "Online"
+                            : "Offline"}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div
+                      style={{
+                        marginTop: "6px",
+                        fontSize: "12px",
+                      }}
+                    >
+                      Live Location
+                    </div>
+
+                    {member.destination && (
+                      <div
+                        style={{
+                          marginTop: "5px",
+                          fontSize: "11px",
+                          color: "#6366f1",
+                        }}
+                      >
+                        📍 Destination set
+                      </div>
+                    )}
+                  </div>
+                </Popup>
+              </Marker>
+            );
           }
+        )}
 
-          return (
-            <Marker
-              key={`member-${id}`}
-              position={[
-                Number(member.location.lat),
-                Number(member.location.lng),
-              ]}
-            >
-              <Popup>
-                <b>
-                  {member.name}
-                  {id === memberId ? " (You)" : ""}
-                </b>
-                <br />
-                <span>{member.online ? "🟢 Online" : "🔴 Offline"}</span>
-                <br />
-                Live Location
-              </Popup>
-            </Marker>
-          );
-        })}
-
-        {/* ================================================
+        {/* ----------------------------------------------
             SAVED DESTINATIONS
-        ================================================ */}
+        ---------------------------------------------- */}
 
-        {Object.entries(members).map(([id, member]) => {
-          if (!member.destination) {
-            return null;
+        {Object.entries(members).map(
+          ([id, member]) => {
+            if (!member.destination) {
+              return null;
+            }
+
+            return (
+              <DestinationMarker
+                key={`destination-${id}`}
+                id={id}
+                member={member}
+                memberId={memberId}
+                onRemove={removeDestination}
+              />
+            );
           }
+        )}
 
-          return (
-            <Marker
-              key={`destination-${id}`}
-              position={[
-                Number(member.destination.lat),
-                Number(member.destination.lng),
-              ]}
-            >
-              <Popup>
-                <b>
-                  {member.name}
-                  's Destination
-                </b>
-                <br />
-                Destination
-              </Popup>
-            </Marker>
-          );
-        })}
-
-        {/* ================================================
+        {/* ----------------------------------------------
             TEMPORARY DESTINATION
-        ================================================ */}
+        ---------------------------------------------- */}
 
         {selectedDestination && (
-          <Marker position={[selectedDestination.lat, selectedDestination.lng]}>
+          <Marker
+            position={[
+              selectedDestination.lat,
+              selectedDestination.lng,
+            ]}
+          >
             <Popup>
               <b>New Destination</b>
+
               <br />
-              Click "Set Destination" to save it.
+
+              Click{" "}
+              <b>"Set Destination"</b>{" "}
+              to save it.
             </Popup>
           </Marker>
         )}
-
-        <MyLocationButton members={members} memberId={memberId} />
       </MapContainer>
     </div>
   );
 }
+
+// ======================================================
+// EXPORT
+// ======================================================
 
 export default Room;

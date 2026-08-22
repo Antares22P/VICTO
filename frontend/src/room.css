@@ -1,0 +1,2002 @@
+/* =========================================================
+   VICTO ROOM
+========================================================= */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  overflow: hidden;
+}
+
+
+/* =========================================================
+   ROOM APP
+========================================================= */
+
+.room-app {
+  width: 100%;
+  height: 100dvh;
+  min-height: 100vh;
+
+  position: relative;
+
+  overflow: hidden;
+
+  background: #080b12;
+
+  color: white;
+
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+
+
+/* =========================================================
+   MAP
+========================================================= */
+
+.room-map {
+  width: 100%;
+  height: 100%;
+}
+
+.room-app .leaflet-container {
+  width: 100%;
+  height: 100%;
+
+  background: #10151f;
+
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+
+
+/* =========================================================
+   TOP BAR
+========================================================= */
+
+.top-bar {
+  position: absolute;
+
+  z-index: 1000;
+
+  top: 16px;
+  left: 16px;
+  right: 16px;
+
+  min-height: 58px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 10px 18px;
+
+  background:
+    rgba(10, 15, 24, 0.88);
+
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+
+  border:
+    1px solid rgba(255, 255, 255, 0.1);
+
+  border-radius: 14px;
+
+  color: white;
+
+  box-shadow:
+    0 8px 30px rgba(0, 0, 0, 0.25);
+
+  pointer-events: auto;
+}
+
+
+/* =========================================================
+   ROOM INFO
+========================================================= */
+
+.room-info {
+  display: flex;
+  align-items: center;
+
+  gap: 18px;
+
+  min-width: 0;
+
+  font-size: 13px;
+}
+
+.room-brand {
+  flex-shrink: 0;
+
+  font-size: 18px;
+
+  font-weight: 800;
+
+  letter-spacing: -0.5px;
+
+  color: white;
+}
+
+.room-detail {
+  color: #aab3c5;
+
+  white-space: nowrap;
+}
+
+.room-detail b {
+  color: white;
+}
+
+
+/* =========================================================
+   MEMBERS PANEL
+========================================================= */
+
+.members-panel {
+  position: absolute;
+
+  z-index: 1000;
+
+  top: 90px;
+  right: 16px;
+
+  width: 270px;
+
+  max-width:
+    calc(100vw - 32px);
+
+  max-height:
+    calc(100vh - 180px);
+
+  padding: 16px;
+
+  overflow-y: auto;
+
+  background:
+    rgba(10, 15, 24, 0.9);
+
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+
+  border:
+    1px solid rgba(255, 255, 255, 0.1);
+
+  border-radius: 14px;
+
+  color: white;
+
+  box-shadow:
+    0 8px 30px rgba(0, 0, 0, 0.25);
+
+  scrollbar-width: thin;
+
+  scrollbar-color:
+    rgba(255, 255, 255, 0.16)
+    transparent;
+}
+
+.members-panel::-webkit-scrollbar {
+  width: 5px;
+}
+
+.members-panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.members-panel::-webkit-scrollbar-thumb {
+  background:
+    rgba(255, 255, 255, 0.16);
+
+  border-radius: 10px;
+}
+
+
+/* =========================================================
+   MEMBERS TITLE
+========================================================= */
+
+.members-title {
+  font-size: 11px;
+
+  font-weight: 800;
+
+  letter-spacing: 1.5px;
+
+  color: #8d98ad;
+
+  margin-bottom: 12px;
+}
+
+
+/* =========================================================
+   MEMBER ROW
+========================================================= */
+
+.member-row {
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  min-width: 0;
+
+  cursor: pointer;
+
+  border-radius: 9px;
+
+  padding: 8px;
+
+  margin: 2px -8px;
+
+  background: transparent;
+
+  border:
+    1px solid transparent;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.member-row:hover {
+  background:
+    rgba(255, 255, 255, 0.05);
+
+  border-color:
+    rgba(255, 255, 255, 0.06);
+}
+
+.member-row:active {
+  transform: scale(0.985);
+}
+
+
+/* =========================================================
+   SELECTED MEMBER ROW
+========================================================= */
+
+.member-row-selected {
+  background:
+    rgba(99, 102, 241, 0.14);
+
+  border-color:
+    rgba(99, 102, 241, 0.3);
+}
+
+.member-row-selected:hover {
+  background:
+    rgba(99, 102, 241, 0.18);
+}
+
+
+/*
+   The current Room.jsx also uses inline selected
+   styles, so this class remains available for
+   future cleanup.
+*/
+
+
+/* =========================================================
+   MEMBER AVATAR / MARKER
+========================================================= */
+
+.victo-member-marker {
+  background: transparent !important;
+
+  border: none !important;
+
+  box-shadow: none !important;
+}
+
+.victo-member-marker > div {
+  cursor: pointer;
+}
+
+
+/* =========================================================
+   MEMBER NAME
+========================================================= */
+
+.member-name {
+  min-width: 0;
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+  color: white;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   MEMBER STATUS
+========================================================= */
+
+.member-status {
+  margin-top: 2px;
+
+  font-size: 11px;
+
+  line-height: 1.2;
+
+  color: #6b7280;
+}
+
+
+/* =========================================================
+   MEMBER DESTINATION INDICATOR
+========================================================= */
+
+.member-destination-indicator {
+  flex-shrink: 0;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  width: 26px;
+  height: 26px;
+
+  border-radius: 7px;
+
+  background:
+    rgba(99, 102, 241, 0.1);
+
+  color: #a5b4fc;
+
+  font-size: 13px;
+}
+
+
+/* =========================================================
+   SELECTED MEMBER DETAILS
+========================================================= */
+
+.selected-member-details {
+  margin-top: 12px;
+
+  padding-top: 12px;
+
+  border-top:
+    1px solid rgba(255, 255, 255, 0.08);
+}
+
+
+/* =========================================================
+   SELECTED MEMBER TITLE
+========================================================= */
+
+.selected-member-title {
+  margin-bottom: 8px;
+
+  font-size: 10px;
+
+  font-weight: 800;
+
+  letter-spacing: 1.2px;
+
+  color: #8d98ad;
+}
+
+
+/* =========================================================
+   SELECTED MEMBER HEADER
+========================================================= */
+
+.selected-member-header {
+  display: flex;
+
+  align-items: center;
+
+  gap: 9px;
+
+  margin-bottom: 10px;
+}
+
+.selected-member-info {
+  min-width: 0;
+}
+
+.selected-member-name {
+  font-size: 14px;
+
+  font-weight: 700;
+
+  color: white;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+}
+
+.selected-member-status {
+  margin-top: 2px;
+
+  font-size: 11px;
+
+  color: #4ade80;
+}
+
+
+/* =========================================================
+   SELECTED MEMBER ROUTE DATA
+========================================================= */
+
+.selected-member-route-data {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 7px;
+}
+
+
+/* =========================================================
+   ROUTE STAT
+========================================================= */
+
+.selected-member-route-stat {
+  padding: 9px;
+
+  background:
+    rgba(255, 255, 255, 0.05);
+
+  border:
+    1px solid rgba(255, 255, 255, 0.07);
+
+  border-radius: 8px;
+}
+
+.selected-member-route-label {
+  margin-bottom: 3px;
+
+  font-size: 10px;
+
+  color: #8d98ad;
+}
+
+.selected-member-route-value {
+  font-size: 14px;
+
+  font-weight: 700;
+
+  color: white;
+}
+
+
+/* =========================================================
+   ROUTE LOADING
+========================================================= */
+
+.selected-member-route-loading {
+  padding: 8px 0;
+
+  font-size: 12px;
+
+  color: #aab3c5;
+}
+
+
+/* =========================================================
+   NO DESTINATION
+========================================================= */
+
+.selected-member-no-destination {
+  font-size: 12px;
+
+  line-height: 1.5;
+
+  color: #8d98ad;
+}
+
+
+/* =========================================================
+   SELECTED MEMBER ROUTE LINE
+========================================================= */
+
+.room-map .leaflet-overlay-pane path {
+  transition:
+    opacity 0.2s ease;
+}
+
+
+/* =========================================================
+   BOTTOM CONTROLS
+========================================================= */
+
+.bottom-controls {
+  position: absolute;
+
+  z-index: 1000;
+
+  left: 50%;
+
+  bottom: 24px;
+
+  transform:
+    translateX(-50%);
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  padding: 8px;
+
+  background:
+    rgba(10, 15, 24, 0.92);
+
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+
+  border:
+    1px solid rgba(255, 255, 255, 0.1);
+
+  border-radius: 14px;
+
+  box-shadow:
+    0 8px 30px rgba(0, 0, 0, 0.3);
+
+  max-width:
+    calc(100vw - 32px);
+}
+
+
+/* =========================================================
+   CONTROL BUTTON
+========================================================= */
+
+.control-button {
+  border: none;
+
+  min-height: 40px;
+
+  padding: 10px 15px;
+
+  border-radius: 9px;
+
+  background: #1a2230;
+
+  color: white;
+
+  font-size: 13px;
+
+  font-weight: 600;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.control-button:hover {
+  background: #273247;
+}
+
+.control-button:active {
+  transform: scale(0.97);
+}
+
+.control-button.active {
+  background: #111827;
+
+  color: white;
+
+  box-shadow:
+    inset 0 0 0 1px
+    rgba(99, 102, 241, 0.35);
+}
+
+.control-button.primary {
+  background: #6366f1;
+
+  color: white;
+}
+
+.control-button.primary:hover {
+  background: #5558df;
+}
+
+
+/* =========================================================
+   DESTINATION ACTIONS
+========================================================= */
+
+.destination-actions {
+  position: absolute;
+
+  z-index: 1000;
+
+  left: 50%;
+
+  bottom: 92px;
+
+  transform:
+    translateX(-50%);
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  padding: 8px;
+
+  background:
+    rgba(10, 15, 24, 0.94);
+
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+
+  border:
+    1px solid rgba(255, 255, 255, 0.1);
+
+  border-radius: 14px;
+
+  box-shadow:
+    0 8px 30px rgba(0, 0, 0, 0.3);
+
+  max-width:
+    calc(100vw - 32px);
+}
+
+
+/* =========================================================
+   DESTINATION BUTTONS
+========================================================= */
+
+.destination-save,
+.destination-cancel {
+  min-height: 40px;
+
+  padding: 10px 14px;
+
+  border: none;
+
+  border-radius: 9px;
+
+  font-size: 13px;
+
+  font-weight: 600;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.destination-save {
+  background: #6366f1;
+
+  color: white;
+}
+
+.destination-save:hover {
+  background: #5558df;
+}
+
+.destination-cancel {
+  background: #1a2230;
+
+  color: white;
+}
+
+.destination-cancel:hover {
+  background: #273247;
+}
+
+.destination-save:active,
+.destination-cancel:active {
+  transform: scale(0.97);
+}
+
+
+/* =========================================================
+   DESTINATION MARKER
+========================================================= */
+
+.victo-destination-icon-wrapper {
+  background: transparent !important;
+
+  border: none !important;
+
+  overflow: visible !important;
+}
+
+
+/* =========================================================
+   DESTINATION MARKER CONTAINER
+========================================================= */
+
+.victo-destination-marker {
+  position: relative;
+
+  width: 170px;
+
+  height: 82px;
+
+  pointer-events: auto;
+}
+
+
+/* =========================================================
+   DESTINATION PIN
+========================================================= */
+
+.victo-destination-pin {
+  position: absolute;
+
+  left: 0;
+
+  top: 0;
+
+  width: 36px;
+
+  height: 36px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius:
+    50% 50% 50% 0;
+
+  transform:
+    rotate(-45deg);
+
+  background: #f43f5e;
+
+  border:
+    3px solid rgba(255, 255, 255, 0.92);
+
+  box-shadow:
+    0 5px 18px rgba(244, 63, 94, 0.45);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.victo-destination-marker:hover
+.victo-destination-pin {
+  transform:
+    rotate(-45deg)
+    scale(1.08);
+
+  box-shadow:
+    0 7px 22px rgba(244, 63, 94, 0.58);
+}
+
+
+/* =========================================================
+   DESTINATION PIN INNER
+========================================================= */
+
+.victo-destination-pin-inner {
+  width: 10px;
+
+  height: 10px;
+
+  border-radius: 50%;
+
+  background: white;
+}
+
+
+/* =========================================================
+   DESTINATION LABEL
+========================================================= */
+
+.victo-destination-label {
+  position: absolute;
+
+  left: 42px;
+
+  top: 5px;
+
+  padding: 6px 9px;
+
+  border-radius: 7px;
+
+  background:
+    rgba(10, 15, 25, 0.94);
+
+  border:
+    1px solid rgba(255, 255, 255, 0.12);
+
+  color: #eef2ff;
+
+  font-size: 10px;
+
+  font-weight: 800;
+
+  line-height: 1.2;
+
+  white-space: nowrap;
+
+  box-shadow:
+    0 5px 18px rgba(0, 0, 0, 0.28);
+}
+
+
+/* =========================================================
+   REMOVE DESTINATION BUTTON
+========================================================= */
+
+.victo-destination-remove {
+  position: absolute;
+
+  left: 42px;
+
+  top: 35px;
+
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 4px;
+
+  min-height: 28px;
+
+  padding: 6px 9px;
+
+  border: none;
+
+  border-radius: 7px;
+
+  background: #ef4444;
+
+  color: white;
+
+  font-size: 10px;
+
+  font-weight: 800;
+
+  line-height: 1;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+
+  opacity: 0;
+
+  visibility: hidden;
+
+  transform:
+    translateY(-4px);
+
+  pointer-events: none;
+
+  transition:
+    opacity 0.16s ease,
+    visibility 0.16s ease,
+    transform 0.16s ease,
+    background 0.16s ease;
+
+  box-shadow:
+    0 5px 16px rgba(239, 68, 68, 0.32);
+}
+
+
+/* =========================================================
+   SHOW REMOVE BUTTON ON HOVER
+========================================================= */
+
+.victo-destination-marker:hover
+.victo-destination-remove {
+  opacity: 1;
+
+  visibility: visible;
+
+  transform:
+    translateY(0);
+
+  pointer-events: auto;
+}
+
+.victo-destination-remove:hover {
+  background: #dc2626;
+}
+
+.victo-destination-remove:active {
+  transform:
+    translateY(0)
+    scale(0.96);
+}
+
+
+/* =========================================================
+   DESTINATION MARKER POPUP
+========================================================= */
+
+.victo-destination-marker
++ .leaflet-popup {
+  z-index: 2000;
+}
+
+
+/* =========================================================
+   NEARBY MEMBER NOTIFICATION
+========================================================= */
+
+.victo-nearby-notification {
+  position: absolute;
+
+  z-index: 3000;
+
+  top: 92px;
+
+  left: 50%;
+
+  transform:
+    translateX(-50%)
+    translateY(-8px);
+
+  min-width: 300px;
+
+  max-width:
+    min(420px, calc(100vw - 32px));
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  padding: 12px 14px;
+
+  border-radius: 12px;
+
+  background:
+    rgba(12, 18, 30, 0.96);
+
+  border:
+    1px solid rgba(74, 222, 128, 0.38);
+
+  box-shadow:
+    0 12px 35px rgba(0, 0, 0, 0.35);
+
+  color: #eef2ff;
+
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  animation:
+    victoNearbyIn
+    0.25s ease
+    forwards;
+}
+
+
+/* =========================================================
+   NEARBY NOTIFICATION ICON
+========================================================= */
+
+.victo-nearby-notification-icon {
+  width: 34px;
+
+  height: 34px;
+
+  flex-shrink: 0;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius: 10px;
+
+  background:
+    rgba(74, 222, 128, 0.13);
+
+  border:
+    1px solid rgba(74, 222, 128, 0.12);
+
+  font-size: 17px;
+}
+
+
+/* =========================================================
+   NEARBY NOTIFICATION CONTENT
+========================================================= */
+
+.victo-nearby-notification-title {
+  margin-bottom: 2px;
+
+  font-size: 12px;
+
+  font-weight: 900;
+
+  letter-spacing: 0.4px;
+
+  color: white;
+}
+
+.victo-nearby-notification-text {
+  font-size: 11px;
+
+  line-height: 1.4;
+
+  color: #aeb8ca;
+}
+
+.victo-nearby-notification-text b {
+  color: white;
+}
+
+
+/* =========================================================
+   NEARBY NOTIFICATION CLOSE
+========================================================= */
+
+.victo-nearby-notification-close {
+  margin-left: auto;
+
+  width: 28px;
+
+  height: 28px;
+
+  flex-shrink: 0;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border: none;
+
+  border-radius: 7px;
+
+  background: transparent;
+
+  color: #94a3b8;
+
+  font-size: 19px;
+
+  line-height: 1;
+
+  cursor: pointer;
+
+  transition:
+    background 0.16s ease,
+    color 0.16s ease;
+}
+
+.victo-nearby-notification-close:hover {
+  background:
+    rgba(255, 255, 255, 0.07);
+
+  color: white;
+}
+
+
+/* =========================================================
+   NEARBY NOTIFICATION ANIMATION
+========================================================= */
+
+@keyframes victoNearbyIn {
+  from {
+    opacity: 0;
+
+    transform:
+      translateX(-50%)
+      translateY(-12px)
+      scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateX(-50%)
+      translateY(0)
+      scale(1);
+  }
+}
+
+
+/* =========================================================
+   TERRAIN BUTTON
+========================================================= */
+
+.terrain-button {
+  position: absolute;
+
+  z-index: 1000;
+
+  left: 16px;
+
+  bottom: 24px;
+
+  min-height: 42px;
+
+  padding: 11px 15px;
+
+  border:
+    1px solid rgba(255, 255, 255, 0.1);
+
+  border-radius: 10px;
+
+  background:
+    rgba(10, 15, 24, 0.9);
+
+  color: white;
+
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  font-size: 13px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.terrain-button:hover {
+  background:
+    rgba(25, 34, 48, 0.95);
+}
+
+.terrain-button:active {
+  transform: scale(0.97);
+}
+
+
+/* =========================================================
+   LEAFLET POPUP
+========================================================= */
+
+.leaflet-popup-content-wrapper {
+  border-radius: 10px;
+
+  background: white;
+
+  color: #111827;
+
+  box-shadow:
+    0 8px 25px rgba(0, 0, 0, 0.22);
+}
+
+.leaflet-popup-content {
+  margin: 12px 14px;
+
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+
+.leaflet-popup-tip {
+  background: white;
+}
+
+
+/* =========================================================
+   LEAFLET CLOSE BUTTON
+========================================================= */
+
+.leaflet-container a.leaflet-popup-close-button {
+  color: #6b7280;
+
+  font-size: 18px;
+
+  transition:
+    color 0.15s ease;
+}
+
+.leaflet-container a.leaflet-popup-close-button:hover {
+  color: #111827;
+}
+
+
+/* =========================================================
+   LEAFLET ZOOM CONTROL
+========================================================= */
+
+.room-app .leaflet-control-zoom {
+  margin-left: 16px;
+
+  margin-top: 84px;
+
+  border: none !important;
+
+  box-shadow:
+    0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+.room-app .leaflet-control-zoom a {
+  width: 34px;
+
+  height: 34px;
+
+  line-height: 34px;
+
+  border: none !important;
+
+  background:
+    rgba(10, 15, 24, 0.9);
+
+  color: white;
+
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.room-app .leaflet-control-zoom a:hover {
+  background:
+    rgba(25, 34, 48, 0.95);
+
+  color: white;
+}
+
+.room-app .leaflet-control-zoom a:first-child {
+  border-radius:
+    9px 9px 0 0;
+}
+
+.room-app .leaflet-control-zoom a:last-child {
+  border-radius:
+    0 0 9px 9px;
+}
+
+
+/* =========================================================
+   LEAFLET ATTRIBUTION
+========================================================= */
+
+.room-app .leaflet-control-attribution {
+  background:
+    rgba(10, 15, 24, 0.7);
+
+  color: #94a3b8;
+
+  border-radius:
+    5px 0 0 0;
+
+  padding:
+    3px 6px;
+
+  font-size: 9px;
+}
+
+.room-app .leaflet-control-attribution a {
+  color: #c7d2fe;
+}
+
+
+/* =========================================================
+   MEMBER MARKER POPUP
+========================================================= */
+
+.victo-member-marker {
+  pointer-events: auto;
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 900px) {
+
+  .top-bar {
+    top: 12px;
+
+    left: 12px;
+
+    right: 12px;
+
+    min-height: 54px;
+
+    padding: 8px 14px;
+  }
+
+  .room-info {
+    gap: 12px;
+  }
+
+  .members-panel {
+    top: 78px;
+
+    right: 12px;
+  }
+
+  .terrain-button {
+    left: 12px;
+
+    bottom: 18px;
+  }
+
+  .bottom-controls {
+    bottom: 18px;
+  }
+
+  .destination-actions {
+    bottom: 82px;
+  }
+
+  .victo-nearby-notification {
+    top: 78px;
+  }
+}
+
+
+/* =========================================================
+   SMALL TABLET / LARGE PHONE
+========================================================= */
+
+@media (max-width: 700px) {
+
+  .top-bar {
+    height: auto;
+
+    min-height: 52px;
+  }
+
+  .room-info {
+    width: 100%;
+
+    justify-content: flex-start;
+
+    gap: 12px;
+  }
+
+  .room-brand {
+    font-size: 16px;
+  }
+
+  .room-detail {
+    font-size: 11px;
+  }
+
+
+  /* MEMBERS */
+
+  .members-panel {
+    top: 76px;
+
+    right: 10px;
+
+    width: 230px;
+
+    padding: 12px;
+  }
+
+  .member-row {
+    padding: 6px 8px;
+  }
+
+  .member-name {
+    font-size: 13px;
+  }
+
+  .member-status {
+    font-size: 10px;
+  }
+
+
+  /* BOTTOM */
+
+  .bottom-controls {
+    bottom: 14px;
+
+    width: auto;
+
+    max-width:
+      calc(100vw - 20px);
+
+    gap: 6px;
+
+    padding: 6px;
+
+    border-radius: 12px;
+  }
+
+  .control-button {
+    min-height: 38px;
+
+    padding: 9px 11px;
+
+    font-size: 12px;
+  }
+
+
+  /* DESTINATION ACTIONS */
+
+  .destination-actions {
+    bottom: 72px;
+
+    max-width:
+      calc(100vw - 20px);
+
+    padding: 6px;
+  }
+
+  .destination-save,
+  .destination-cancel {
+    min-height: 38px;
+
+    padding: 9px 11px;
+
+    font-size: 12px;
+  }
+
+
+  /* TERRAIN */
+
+  .terrain-button {
+    left: 10px;
+
+    bottom: 14px;
+
+    min-height: 38px;
+
+    padding: 9px 11px;
+
+    font-size: 12px;
+  }
+
+
+  /* NEARBY */
+
+  .victo-nearby-notification {
+    top: 76px;
+
+    min-width: 0;
+
+    width:
+      calc(100vw - 24px);
+
+    max-width:
+      calc(100vw - 24px);
+  }
+
+
+  /* ZOOM */
+
+  .room-app .leaflet-control-zoom {
+    margin-top: 66px;
+
+    margin-left: 10px;
+  }
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 520px) {
+
+  .top-bar {
+    top: 8px;
+
+    left: 8px;
+
+    right: 8px;
+
+    min-height: 48px;
+
+    padding: 7px 11px;
+
+    border-radius: 12px;
+  }
+
+  .room-info {
+    gap: 9px;
+  }
+
+  .room-brand {
+    font-size: 15px;
+  }
+
+  .room-detail {
+    font-size: 10px;
+  }
+
+
+  /* MEMBERS PANEL */
+
+  .members-panel {
+    top: 66px;
+
+    right: 8px;
+
+    width: 200px;
+
+    max-width:
+      calc(100vw - 16px);
+
+    max-height:
+      calc(100vh - 145px);
+
+    padding: 11px;
+
+    border-radius: 12px;
+  }
+
+  .members-title {
+    font-size: 10px;
+
+    margin-bottom: 7px;
+  }
+
+  .member-row {
+    gap: 8px;
+
+    padding: 5px 7px;
+  }
+
+  .member-name {
+    font-size: 12px;
+  }
+
+  .member-status {
+    font-size: 9px;
+  }
+
+
+  /* SELECTED MEMBER */
+
+  .selected-member-route-data {
+    gap: 5px;
+  }
+
+  .selected-member-route-stat {
+    padding: 8px;
+  }
+
+  .selected-member-route-label {
+    font-size: 9px;
+  }
+
+  .selected-member-route-value {
+    font-size: 12px;
+  }
+
+
+  /* BOTTOM */
+
+  .bottom-controls {
+    left: 50%;
+
+    bottom: 10px;
+
+    width:
+      calc(100vw - 16px);
+
+    max-width:
+      calc(100vw - 16px);
+
+    justify-content: center;
+
+    gap: 5px;
+
+    padding: 5px;
+
+    border-radius: 12px;
+  }
+
+  .control-button {
+    flex: 1;
+
+    min-width: 0;
+
+    min-height: 38px;
+
+    padding: 8px 6px;
+
+    font-size: 11px;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+  }
+
+
+  /* DESTINATION ACTIONS */
+
+  .destination-actions {
+    left: 50%;
+
+    bottom: 62px;
+
+    width:
+      calc(100vw - 16px);
+
+    max-width:
+      calc(100vw - 16px);
+
+    justify-content: center;
+
+    gap: 5px;
+
+    padding: 5px;
+
+    border-radius: 12px;
+  }
+
+  .destination-save,
+  .destination-cancel {
+    flex: 1;
+
+    min-width: 0;
+
+    min-height: 38px;
+
+    padding: 8px 6px;
+
+    font-size: 11px;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+  }
+
+
+  /* TERRAIN */
+
+  .terrain-button {
+    left: 8px;
+
+    bottom: 64px;
+
+    min-height: 36px;
+
+    padding: 8px 10px;
+
+    font-size: 11px;
+
+    border-radius: 9px;
+  }
+
+
+  /* NEARBY NOTIFICATION */
+
+  .victo-nearby-notification {
+    top: 62px;
+
+    width:
+      calc(100vw - 24px);
+
+    max-width:
+      calc(100vw - 24px);
+
+    padding: 10px 11px;
+
+    border-radius: 11px;
+  }
+
+  .victo-nearby-notification-icon {
+    width: 32px;
+
+    height: 32px;
+
+    border-radius: 9px;
+
+    font-size: 15px;
+  }
+
+  .victo-nearby-notification-title {
+    font-size: 11px;
+  }
+
+  .victo-nearby-notification-text {
+    font-size: 10px;
+  }
+
+  .victo-nearby-notification-close {
+    width: 25px;
+
+    height: 25px;
+
+    font-size: 17px;
+  }
+
+
+  /* DESTINATION */
+
+  .victo-destination-marker {
+    width: 145px;
+
+    height: 75px;
+  }
+
+  .victo-destination-label {
+    left: 39px;
+
+    top: 4px;
+
+    padding: 5px 7px;
+
+    font-size: 9px;
+  }
+
+  .victo-destination-remove {
+    left: 39px;
+
+    top: 32px;
+
+    min-height: 26px;
+
+    padding: 5px 7px;
+
+    font-size: 9px;
+  }
+
+  .victo-destination-pin {
+    width: 32px;
+
+    height: 32px;
+  }
+
+  .victo-destination-pin-inner {
+    width: 9px;
+
+    height: 9px;
+  }
+
+
+  /* LEAFLET */
+
+  .room-app .leaflet-control-zoom {
+    margin-top: 58px;
+
+    margin-left: 8px;
+  }
+
+  .room-app .leaflet-control-zoom a {
+    width: 31px;
+
+    height: 31px;
+
+    line-height: 31px;
+
+    font-size: 16px;
+  }
+
+  .room-app .leaflet-control-attribution {
+    font-size: 8px;
+
+    padding:
+      2px 4px;
+  }
+}
+
+
+/* =========================================================
+   VERY SMALL PHONES
+========================================================= */
+
+@media (max-width: 380px) {
+
+  .room-detail {
+    display: none;
+  }
+
+  .members-panel {
+    width: 180px;
+  }
+
+  .room-brand {
+    font-size: 14px;
+  }
+
+  .control-button {
+    font-size: 10px;
+
+    padding-left: 4px;
+
+    padding-right: 4px;
+  }
+
+  .terrain-button {
+    font-size: 10px;
+  }
+
+  .destination-save,
+  .destination-cancel {
+    font-size: 10px;
+  }
+
+  .victo-nearby-notification {
+    padding: 9px;
+  }
+
+  .victo-nearby-notification-text {
+    font-size: 9px;
+  }
+}
+
+
+/* =========================================================
+   LANDSCAPE MOBILE
+========================================================= */
+
+@media (max-height: 500px) and (orientation: landscape) {
+
+  .top-bar {
+    top: 6px;
+
+    left: 8px;
+
+    right: 8px;
+
+    min-height: 44px;
+
+    padding: 5px 10px;
+  }
+
+  .room-brand {
+    font-size: 14px;
+  }
+
+  .room-detail {
+    font-size: 9px;
+  }
+
+  .members-panel {
+    top: 58px;
+
+    max-height: 170px;
+
+    overflow-y: auto;
+  }
+
+  .bottom-controls {
+    bottom: 8px;
+  }
+
+  .destination-actions {
+    bottom: 58px;
+  }
+
+  .terrain-button {
+    bottom: 8px;
+  }
+
+  .victo-nearby-notification {
+    top: 55px;
+  }
+
+  .room-app .leaflet-control-zoom {
+    margin-top: 48px;
+  }
+}
+
+
+/* =========================================================
+   HOVER DEVICE SUPPORT
+========================================================= */
+
+@media (hover: none) {
+
+  /*
+    Touch devices don't have a true hover state.
+
+    Keep the destination remove button visible
+    so users can still remove a destination.
+  */
+
+  .victo-destination-remove {
+    opacity: 1;
+
+    visibility: visible;
+
+    transform: translateY(0);
+
+    pointer-events: auto;
+  }
+
+  .member-row:hover {
+    background: transparent;
+
+    border-color: transparent;
+  }
+
+  .control-button:hover {
+    background: #1a2230;
+  }
+
+  .control-button.primary:hover {
+    background: #6366f1;
+  }
+}
+
+
+/* =========================================================
+   FOCUS ACCESSIBILITY
+========================================================= */
+
+.control-button:focus-visible,
+.destination-save:focus-visible,
+.destination-cancel:focus-visible,
+.terrain-button:focus-visible,
+.victo-destination-remove:focus-visible,
+.victo-nearby-notification-close:focus-visible {
+  outline:
+    2px solid #818cf8;
+
+  outline-offset: 2px;
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+
+    animation-duration:
+      0.01ms !important;
+
+    animation-iteration-count:
+      1 !important;
+
+    transition-duration:
+      0.01ms !important;
+  }
+}

@@ -5,6 +5,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.victo.backend.model.Destination;
 import org.springframework.web.bind.annotation.*;
 
+
 @RestController
 @RequestMapping("/api/destination")
 @CrossOrigin(origins = "http://localhost:5173")

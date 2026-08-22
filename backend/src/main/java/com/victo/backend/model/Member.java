@@ -9,12 +9,12 @@ public class Member {
     private String roomId;
 
     public String getRoomId() {
-    return roomId;
-}
+        return roomId;
+    }
 
-public void setRoomId(String roomId) {
-    this.roomId = roomId;
-}
+    public void setRoomId(String roomId) {
+        this.roomId = roomId;
+    }
 
     public Member() {
     }
