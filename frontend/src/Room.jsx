@@ -8,6 +8,7 @@ import {
   Marker,
   Popup,
   Polyline,
+  Tooltip,
 } from "react-leaflet";
 
 import { ref, onValue } from "firebase/database";
@@ -91,11 +92,7 @@ function MemberAvatar({ member, size = 34 }) {
     );
   }
 
-  return (
-    <div style={avatarStyle}>
-      {getInitialAvatar(member?.name)}
-    </div>
-  );
+  return <div style={avatarStyle}>{getInitialAvatar(member?.name)}</div>;
 }
 
 // ======================================================
@@ -240,14 +237,33 @@ function getDistanceMeters(lat1, lng1, lat2, lng2) {
       Math.cos(toRadians(lat2)) *
       Math.sin(dLng / 2) ** 2;
 
-  return (
-    2 *
-    earthRadius *
-    Math.atan2(
-      Math.sqrt(a),
-      Math.sqrt(1 - a)
-    )
-  );
+  return 2 * earthRadius * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+// ======================================================
+// ROUTE COLORS
+// ======================================================
+
+const ROUTE_COLORS = [
+  "#22d3ee",
+  "#a78bfa",
+  "#fb7185",
+  "#fbbf24",
+  "#34d399",
+  "#60a5fa",
+  "#f472b6",
+  "#c084fc",
+];
+
+function getRouteColor(memberId, members) {
+  const ids = Object.keys(members);
+  const index = ids.indexOf(memberId);
+
+  if (index === -1) {
+    return ROUTE_COLORS[0];
+  }
+
+  return ROUTE_COLORS[index % ROUTE_COLORS.length];
 }
 
 // ======================================================
@@ -256,8 +272,7 @@ function getDistanceMeters(lat1, lng1, lat2, lng2) {
 
 function playNearbySound() {
   try {
-    const AudioContext =
-      window.AudioContext || window.webkitAudioContext;
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
 
     if (!AudioContext) {
       return;
@@ -275,22 +290,13 @@ function playNearbySound() {
 
       oscillator.frequency.setValueAtTime(880, now);
 
-      oscillator.frequency.exponentialRampToValueAtTime(
-        660,
-        now + 0.18
-      );
+      oscillator.frequency.exponentialRampToValueAtTime(660, now + 0.18);
 
       gain.gain.setValueAtTime(0.0001, now);
 
-      gain.gain.exponentialRampToValueAtTime(
-        0.18,
-        now + 0.02
-      );
+      gain.gain.exponentialRampToValueAtTime(0.18, now + 0.02);
 
-      gain.gain.exponentialRampToValueAtTime(
-        0.0001,
-        now + 0.22
-      );
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.22);
 
       oscillator.connect(gain);
       gain.connect(context.destination);
@@ -314,10 +320,7 @@ function playNearbySound() {
       playTone();
     }
   } catch (error) {
-    console.warn(
-      "Nearby notification sound could not play:",
-      error
-    );
+    console.warn("Nearby notification sound could not play:", error);
   }
 }
 
@@ -325,12 +328,7 @@ function playNearbySound() {
 // DESTINATION MARKER
 // ======================================================
 
-function DestinationMarker({
-  id,
-  member,
-  memberId,
-  onRemove,
-}) {
+function DestinationMarker({ id, member, memberId, onRemove }) {
   const markerRef = useRef(null);
 
   const isOwnDestination = id === memberId;
@@ -355,9 +353,7 @@ function DestinationMarker({
       return;
     }
 
-    const button = element.querySelector(
-      ".victo-destination-remove"
-    );
+    const button = element.querySelector(".victo-destination-remove");
 
     if (!button || !isOwnDestination) {
       return;
@@ -493,22 +489,23 @@ function Room() {
 
   const [members, setMembers] = useState({});
 
-  const [selectedDestination, setSelectedDestination] =
-    useState(null);
+  const [selectedDestination, setSelectedDestination] = useState(null);
 
   const [followMe, setFollowMe] = useState(false);
 
-  const [selectedMemberId, setSelectedMemberId] =
-    useState(null);
+  const [meshEnabled, setMeshEnabled] = useState(false);
 
-  const [selectedMemberRoute, setSelectedMemberRoute] =
-    useState(null);
+  const [selectedMemberId, setSelectedMemberId] = useState(null);
 
-  const [loadingMemberRoute, setLoadingMemberRoute] =
-    useState(false);
+  const [selectedMemberRoute, setSelectedMemberRoute] = useState(null);
 
-  const [nearbyNotification, setNearbyNotification] =
-    useState(null);
+  const [memberRoutes, setMemberRoutes] = useState([]);
+
+  const [loadingMemberRoute, setLoadingMemberRoute] = useState(false);
+
+  const [nearbyNotification, setNearbyNotification] = useState(null);
+
+  const [membersPanelOpen, setMembersPanelOpen] = useState(true);
 
   // Members currently inside 30m.
   // Prevents repeated sounds on every Firebase update.
@@ -527,8 +524,7 @@ function Room() {
   // INVITE LINK
   // ====================================================
 
-  const inviteLink =
-    `${window.location.origin}/join/${roomCode}`;
+  const inviteLink = `${window.location.origin}/join/${roomCode}`;
 
   // ====================================================
   // COPY INVITE LINK
@@ -546,6 +542,25 @@ function Room() {
     }
   };
 
+  const leaveRoom = () => {
+    const confirmed = window.confirm(
+      "Are you sure you want to leave this room?",
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    // Clear this user's room session
+    localStorage.removeItem("roomId");
+    localStorage.removeItem("roomCode");
+    localStorage.removeItem("memberId");
+    localStorage.removeItem("name");
+
+    // Return to home page
+    window.location.href = "/";
+  };
+
   // ====================================================
   // FIREBASE - LISTEN TO MEMBERS
   // ====================================================
@@ -556,10 +571,7 @@ function Room() {
       return;
     }
 
-    const membersRef = ref(
-      database,
-      `rooms/${roomId}/members`
-    );
+    const membersRef = ref(database, `rooms/${roomId}/members`);
 
     const unsubscribe = onValue(
       membersRef,
@@ -571,17 +583,155 @@ function Room() {
         setMembers(data);
       },
       (error) => {
-        console.error(
-          "Firebase listener error:",
-          error
-        );
-      }
+        console.error("Firebase listener error:", error);
+      },
     );
 
     return () => {
       unsubscribe();
     };
   }, [roomId]);
+
+  // ======================================================
+  // CALCULATE ALL MEMBER → ALL DESTINATION ROUTES
+  // ======================================================
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const calculateAllRoutes = async () => {
+      // --------------------------------------------------
+      // ALL MEMBERS WITH VALID LOCATIONS
+      // --------------------------------------------------
+
+      const validMembers = Object.entries(members).filter(([, member]) => {
+        if (!member?.location) {
+          return false;
+        }
+
+        const lat = Number(member.location.lat);
+        const lng = Number(member.location.lng);
+
+        return Number.isFinite(lat) && Number.isFinite(lng);
+      });
+
+      // --------------------------------------------------
+      // ALL MEMBERS WHO HAVE DESTINATIONS
+      // --------------------------------------------------
+
+      const destinations = Object.entries(members).filter(([, member]) => {
+        if (!member?.destination) {
+          return false;
+        }
+
+        const lat = Number(member.destination.lat);
+        const lng = Number(member.destination.lng);
+
+        return Number.isFinite(lat) && Number.isFinite(lng);
+      });
+
+      // Nothing to calculate
+      if (validMembers.length === 0 || destinations.length === 0) {
+        setMemberRoutes([]);
+        return;
+      }
+
+      // --------------------------------------------------
+      // CREATE MEMBER → DESTINATION COMBINATIONS
+      // --------------------------------------------------
+
+      const routeRequests = [];
+
+      validMembers.forEach(([memberId, member]) => {
+        destinations.forEach(([destinationMemberId, destinationMember]) => {
+          routeRequests.push({
+            memberId,
+            destinationMemberId,
+
+            startLat: Number(member.location.lat),
+
+            startLng: Number(member.location.lng),
+
+            endLat: Number(destinationMember.destination.lat),
+
+            endLng: Number(destinationMember.destination.lng),
+          });
+        });
+      });
+
+      // --------------------------------------------------
+      // REQUEST ALL ROUTES
+      // --------------------------------------------------
+
+      const results = await Promise.all(
+        routeRequests.map(async (request) => {
+          try {
+            const url =
+              `https://router.project-osrm.org/route/v1/driving/` +
+              `${request.startLng},${request.startLat};` +
+              `${request.endLng},${request.endLat}` +
+              `?overview=full&geometries=geojson`;
+
+            const response = await fetch(url);
+
+            if (!response.ok) {
+              throw new Error(`OSRM HTTP error: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            if (!data.routes || data.routes.length === 0) {
+              return null;
+            }
+
+            const route = data.routes[0];
+
+            const coordinates = route.geometry.coordinates.map(([lng, lat]) => [
+              lat,
+              lng,
+            ]);
+
+            return {
+              memberId: request.memberId,
+
+              destinationMemberId: request.destinationMemberId,
+
+              coordinates,
+
+              distance: route.distance,
+
+              duration: route.duration,
+            };
+          } catch (error) {
+            console.error(
+              "Route calculation failed:",
+              request.memberId,
+              "→",
+              request.destinationMemberId,
+              error,
+            );
+
+            return null;
+          }
+        }),
+      );
+
+      if (cancelled) {
+        return;
+      }
+
+      // Remove failed routes
+      const validRoutes = results.filter(Boolean);
+
+      setMemberRoutes(validRoutes);
+    };
+
+    calculateAllRoutes();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [members]);
 
   // ====================================================
   // NEARBY MEMBER SOUND / NOTIFICATION
@@ -598,39 +748,25 @@ function Room() {
     const myLat = Number(me.location.lat);
     const myLng = Number(me.location.lng);
 
-    if (
-      !Number.isFinite(myLat) ||
-      !Number.isFinite(myLng)
-    ) {
+    if (!Number.isFinite(myLat) || !Number.isFinite(myLng)) {
       return;
     }
 
     const currentlyNearby = new Set();
 
     Object.entries(members).forEach(([id, member]) => {
-      if (
-        id === memberId ||
-        !member?.location
-      ) {
+      if (id === memberId || !member?.location) {
         return;
       }
 
       const memberLat = Number(member.location.lat);
       const memberLng = Number(member.location.lng);
 
-      if (
-        !Number.isFinite(memberLat) ||
-        !Number.isFinite(memberLng)
-      ) {
+      if (!Number.isFinite(memberLat) || !Number.isFinite(memberLng)) {
         return;
       }
 
-      const distance = getDistanceMeters(
-        myLat,
-        myLng,
-        memberLat,
-        memberLng
-      );
+      const distance = getDistanceMeters(myLat, myLng, memberLat, memberLng);
 
       // ==================================================
       // MEMBER IS WITHIN 30 METERS
@@ -643,9 +779,7 @@ function Room() {
         // the 30m radius.
         if (!nearbyMembersRef.current.has(id)) {
           const distanceText =
-            distance < 1
-              ? "less than 1 m"
-              : `${Math.round(distance)} m`;
+            distance < 1 ? "less than 1 m" : `${Math.round(distance)} m`;
 
           setNearbyNotification({
             id: `${id}-${Date.now()}`,
@@ -668,10 +802,7 @@ function Room() {
                   `is ${distanceText} away from you.`,
               });
             } catch (error) {
-              console.warn(
-                "Browser notification failed:",
-                error
-              );
+              console.warn("Browser notification failed:", error);
             }
           }
         }
@@ -717,29 +848,20 @@ function Room() {
             `&online=true`,
           {
             method: "POST",
-          }
+          },
         );
 
         if (!response.ok) {
-          console.error(
-            "Online status error:",
-            response.status
-          );
+          console.error("Online status error:", response.status);
         }
       } catch (error) {
-        console.error(
-          "Heartbeat failed:",
-          error
-        );
+        console.error("Heartbeat failed:", error);
       }
     };
 
     updateOnlineStatus();
 
-    const interval = setInterval(
-      updateOnlineStatus,
-      10000
-    );
+    const interval = setInterval(updateOnlineStatus, 10000);
 
     return () => {
       clearInterval(interval);
@@ -756,73 +878,59 @@ function Room() {
     }
 
     if (!navigator.geolocation) {
-      alert(
-        "Geolocation is not supported by your browser."
-      );
+      alert("Geolocation is not supported by your browser.");
 
       return;
     }
 
-    const watchId =
-      navigator.geolocation.watchPosition(
-        async (position) => {
-          const location = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-            updatedAt: Date.now(),
-          };
+    const watchId = navigator.geolocation.watchPosition(
+      async (position) => {
+        const location = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+          updatedAt: Date.now(),
+        };
 
-          console.log("My location:", location);
+        console.log("My location:", location);
 
-          try {
-            const response = await fetch(
-              `${API_URL}/api/location` +
-                `?roomId=${encodeURIComponent(roomId)}` +
-                `&memberId=${encodeURIComponent(memberId)}`,
-              {
-                method: "POST",
+        try {
+          const response = await fetch(
+            `${API_URL}/api/location` +
+              `?roomId=${encodeURIComponent(roomId)}` +
+              `&memberId=${encodeURIComponent(memberId)}`,
+            {
+              method: "POST",
 
-                headers: {
-                  "Content-Type": "application/json",
-                },
+              headers: {
+                "Content-Type": "application/json",
+              },
 
-                body: JSON.stringify(location),
-              }
-            );
-
-            if (!response.ok) {
-              console.error(
-                "Location API error:",
-                await response.text()
-              );
-
-              return;
-            }
-
-            console.log(
-              "Location updated successfully"
-            );
-          } catch (error) {
-            console.error(
-              "Location update failed:",
-              error
-            );
-          }
-        },
-
-        (error) => {
-          console.error(
-            "GPS error:",
-            error
+              body: JSON.stringify(location),
+            },
           );
-        },
 
-        {
-          enableHighAccuracy: true,
-          maximumAge: 2000,
-          timeout: 10000,
+          if (!response.ok) {
+            console.error("Location API error:", await response.text());
+
+            return;
+          }
+
+          console.log("Location updated successfully");
+        } catch (error) {
+          console.error("Location update failed:", error);
         }
-      );
+      },
+
+      (error) => {
+        console.error("GPS error:", error);
+      },
+
+      {
+        enableHighAccuracy: true,
+        maximumAge: 2000,
+        timeout: 10000,
+      },
+    );
 
     return () => {
       navigator.geolocation.clearWatch(watchId);
@@ -856,13 +964,11 @@ function Room() {
             name: `${name}'s Destination`,
             updatedAt: Date.now(),
           }),
-        }
+        },
       );
 
       if (!response.ok) {
-        throw new Error(
-          "Failed to save destination"
-        );
+        throw new Error("Failed to save destination");
       }
 
       console.log("Destination saved");
@@ -871,10 +977,7 @@ function Room() {
 
       setSelectedDestination(null);
     } catch (error) {
-      console.error(
-        "Destination error:",
-        error
-      );
+      console.error("Destination error:", error);
 
       alert("Could not set destination");
     }
@@ -884,9 +987,7 @@ function Room() {
   // REMOVE SAVED DESTINATION
   // ====================================================
 
-  const removeDestination = async (
-    destinationMemberId = memberId
-  ) => {
+  const removeDestination = async (destinationMemberId = memberId) => {
     if (!roomId || !destinationMemberId) {
       return;
     }
@@ -894,9 +995,7 @@ function Room() {
     // Only the owner can remove
     // their destination.
     if (destinationMemberId !== memberId) {
-      alert(
-        "You can only remove your own destination."
-      );
+      alert("You can only remove your own destination.");
 
       return;
     }
@@ -905,18 +1004,14 @@ function Room() {
       const response = await fetch(
         `${API_URL}/api/destination` +
           `?roomId=${encodeURIComponent(roomId)}` +
-          `&memberId=${encodeURIComponent(
-            destinationMemberId
-          )}`,
+          `&memberId=${encodeURIComponent(destinationMemberId)}`,
         {
           method: "DELETE",
-        }
+        },
       );
 
       if (!response.ok) {
-        throw new Error(
-          `Failed to remove destination: ${response.status}`
-        );
+        throw new Error(`Failed to remove destination: ${response.status}`);
       }
 
       setSelectedDestination(null);
@@ -928,10 +1023,7 @@ function Room() {
 
       console.log("Destination removed");
     } catch (error) {
-      console.error(
-        "Remove destination error:",
-        error
-      );
+      console.error("Remove destination error:", error);
 
       alert("Could not remove destination.");
     }
@@ -980,10 +1072,7 @@ function Room() {
     const startLat = Number(member.location.lat);
     const startLng = Number(member.location.lng);
 
-    if (
-      !Number.isFinite(startLat) ||
-      !Number.isFinite(startLng)
-    ) {
+    if (!Number.isFinite(startLat) || !Number.isFinite(startLng)) {
       return;
     }
 
@@ -998,10 +1087,7 @@ function Room() {
     const endLat = Number(member.destination.lat);
     const endLng = Number(member.destination.lng);
 
-    if (
-      !Number.isFinite(endLat) ||
-      !Number.isFinite(endLng)
-    ) {
+    if (!Number.isFinite(endLat) || !Number.isFinite(endLng)) {
       return;
     }
 
@@ -1021,26 +1107,21 @@ function Room() {
       const response = await fetch(url);
 
       if (!response.ok) {
-        throw new Error(
-          `OSRM HTTP error: ${response.status}`
-        );
+        throw new Error(`OSRM HTTP error: ${response.status}`);
       }
 
       const data = await response.json();
 
-      if (
-        !data.routes ||
-        data.routes.length === 0
-      ) {
+      if (!data.routes || data.routes.length === 0) {
         throw new Error("No route found");
       }
 
       const route = data.routes[0];
 
-      const coordinates =
-        route.geometry.coordinates.map(
-          ([lng, lat]) => [lat, lng]
-        );
+      const coordinates = route.geometry.coordinates.map(([lng, lat]) => [
+        lat,
+        lng,
+      ]);
 
       setSelectedMemberRoute({
         memberId: id,
@@ -1049,10 +1130,7 @@ function Room() {
         duration: route.duration,
       });
     } catch (error) {
-      console.error(
-        "Selected member route error:",
-        error
-      );
+      console.error("Selected member route error:", error);
 
       setSelectedMemberRoute(null);
     } finally {
@@ -1110,9 +1188,7 @@ function Room() {
     const me = members[memberId];
 
     if (!me?.location) {
-      alert(
-        "Your location is not available yet."
-      );
+      alert("Your location is not available yet.");
 
       return;
     }
@@ -1120,13 +1196,8 @@ function Room() {
     const lat = Number(me.location.lat);
     const lng = Number(me.location.lng);
 
-    if (
-      !Number.isFinite(lat) ||
-      !Number.isFinite(lng)
-    ) {
-      alert(
-        "Your location is not available yet."
-      );
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+      alert("Your location is not available yet.");
 
       return;
     }
@@ -1137,7 +1208,7 @@ function Room() {
           lat,
           lng,
         },
-      })
+      }),
     );
   };
 
@@ -1145,9 +1216,7 @@ function Room() {
   // CURRENT SELECTED MEMBER
   // ====================================================
 
-  const selectedMember = selectedMemberId
-    ? members[selectedMemberId]
-    : null;
+  const selectedMember = selectedMemberId ? members[selectedMemberId] : null;
 
   // ====================================================
   // RENDER
@@ -1156,40 +1225,39 @@ function Room() {
   return (
     <div className="room-app">
 
+
+        {/* ==================================================
+    LEAVE ROOM
+================================================== */}
+
+<button
+  type="button"
+  className="leave-room-button"
+  onClick={leaveRoom}
+>
+  ← Leave
+</button>
       {/* ==================================================
           NEARBY MEMBER NOTIFICATION
       ================================================== */}
 
       {nearbyNotification && (
-        <div
-          className="victo-nearby-notification"
-          role="status"
-        >
-          <div className="victo-nearby-notification-icon">
-            🔔
-          </div>
+        <div className="victo-nearby-notification" role="status">
+          <div className="victo-nearby-notification-icon">🔔</div>
 
           <div>
-            <div className="victo-nearby-notification-title">
-              Member nearby
-            </div>
+            <div className="victo-nearby-notification-title">Member nearby</div>
 
             <div className="victo-nearby-notification-text">
-              <b>
-                {nearbyNotification.name}
-              </b>{" "}
-              is{" "}
-              {nearbyNotification.distanceText}{" "}
-              away.
+              <b>{nearbyNotification.name}</b> is{" "}
+              {nearbyNotification.distanceText} away.
             </div>
           </div>
 
           <button
             type="button"
             className="victo-nearby-notification-close"
-            onClick={() =>
-              setNearbyNotification(null)
-            }
+            onClick={() => setNearbyNotification(null)}
             aria-label="Close notification"
           >
             ×
@@ -1203,23 +1271,15 @@ function Room() {
 
       <div className="top-bar">
         <div className="room-info">
+          <div className="room-brand">Victo</div>
 
-          <div className="room-brand">
-            Victo
+          <div className="room-detail">
+            Room: <b>{roomCode}</b>
           </div>
 
           <div className="room-detail">
-            Room:{" "}
-            <b>{roomCode}</b>
+            Members: <b>{Object.keys(members).length}</b>
           </div>
-
-          <div className="room-detail">
-            Members:{" "}
-            <b>
-              {Object.keys(members).length}
-            </b>
-          </div>
-
         </div>
       </div>
 
@@ -1227,268 +1287,218 @@ function Room() {
           MEMBERS PANEL
       ================================================== */}
 
-      <div className="members-panel">
+      {/* ==================================================
+    MEMBERS PANEL
+================================================== */}
 
-        <div className="members-title">
-          MEMBERS
-        </div>
+      {membersPanelOpen ? (
+        <div className="members-panel premium-members-panel">
+          {/* ----------------------------------------------
+        HEADER
+    ---------------------------------------------- */}
 
-        {Object.entries(members).map(
-          ([id, member]) => {
-            const isSelected =
-              id === selectedMemberId;
-
-            const hasDestination =
-              Boolean(member.destination);
-
-            return (
-              <div
-                className="member-row"
-                key={id}
-                onClick={() =>
-                  selectMember(id)
-                }
-                style={{
-                  cursor: "pointer",
-                  borderRadius: "10px",
-                  padding: "8px",
-                  margin: "2px -8px",
-                  background: isSelected
-                    ? "rgba(99,102,241,0.14)"
-                    : "transparent",
-                  border: isSelected
-                    ? "1px solid rgba(99,102,241,0.3)"
-                    : "1px solid transparent",
-                  transition: "0.2s ease",
-                }}
-              >
-                <MemberAvatar
-                  member={member}
-                  size={34}
-                />
-
-                <div
-                  style={{
-                    flex: 1,
-                    minWidth: 0,
-                  }}
-                >
-                  <div className="member-name">
-                    {member.name}
-
-                    {id === memberId && (
-                      <span
-                        style={{
-                          marginLeft: "6px",
-                          fontSize: "10px",
-                          color: "#6366f1",
-                          fontWeight: 800,
-                        }}
-                      >
-                        YOU
-                      </span>
-                    )}
-                  </div>
-
-                  <div
-                    className="member-status"
-                    style={{
-                      color: member.online
-                        ? "#4ade80"
-                        : "#6b7280",
-                    }}
-                  >
-                    ●{" "}
-                    {member.online
-                      ? "Online"
-                      : "Offline"}
-                  </div>
-                </div>
-
-                {hasDestination && (
-                  <div
-                    style={{
-                      fontSize: "13px",
-                      opacity: 0.7,
-                    }}
-                    title="Destination set"
-                  >
-                    📍
-                  </div>
-                )}
-              </div>
-            );
-          }
-        )}
-
-        {/* ==================================================
-            SELECTED MEMBER DETAILS
-        ================================================== */}
-
-        {selectedMember && (
-          <div
-            style={{
-              marginTop: "12px",
-              paddingTop: "12px",
-              borderTop:
-                "1px solid rgba(255,255,255,0.08)",
-            }}
-          >
-            <div
-              style={{
-                fontSize: "10px",
-                fontWeight: 800,
-                letterSpacing: "1.2px",
-                color: "#8d98ad",
-                marginBottom: "8px",
-              }}
-            >
-              SELECTED MEMBER
-            </div>
-
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "9px",
-                marginBottom: "10px",
-              }}
-            >
-              <MemberAvatar
-                member={selectedMember}
-                size={38}
-              />
+          <div className="members-panel-header">
+            <div className="members-panel-title-group">
+              <div className="members-panel-icon">👥</div>
 
               <div>
-                <div
-                  style={{
-                    fontSize: "14px",
-                    fontWeight: 700,
-                  }}
-                >
-                  {selectedMember.name}
-                </div>
+                <div className="members-panel-title">Members</div>
 
-                <div
-                  style={{
-                    fontSize: "11px",
-                    color: selectedMember.online
-                      ? "#4ade80"
-                      : "#6b7280",
-                    marginTop: "2px",
-                  }}
-                >
-                  ●{" "}
-                  {selectedMember.online
-                    ? "Online"
-                    : "Offline"}
+                <div className="members-panel-count">
+                  {Object.keys(members).length}{" "}
+                  {Object.keys(members).length === 1 ? "member" : "members"}
                 </div>
               </div>
             </div>
 
-            {loadingMemberRoute && (
-              <div
-                style={{
-                  fontSize: "12px",
-                  color: "#aab3c5",
-                  padding: "8px 0",
-                }}
-              >
-                Calculating route...
-              </div>
-            )}
-
-            {!loadingMemberRoute &&
-              !selectedMember.destination && (
-                <div
-                  style={{
-                    fontSize: "12px",
-                    color: "#8d98ad",
-                    lineHeight: 1.5,
-                  }}
-                >
-                  📍 No destination set
-                </div>
-              )}
-
-            {!loadingMemberRoute &&
-              selectedMemberRoute && (
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns:
-                      "1fr 1fr",
-                    gap: "7px",
-                  }}
-                >
-                  <div
-                    style={{
-                      padding: "9px",
-                      background:
-                        "rgba(255,255,255,0.05)",
-                      border:
-                        "1px solid rgba(255,255,255,0.07)",
-                      borderRadius: "8px",
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: "10px",
-                        color: "#8d98ad",
-                        marginBottom: "3px",
-                      }}
-                    >
-                      DISTANCE
-                    </div>
-
-                    <div
-                      style={{
-                        fontSize: "14px",
-                        fontWeight: 700,
-                      }}
-                    >
-                      {formatDistance(
-                        selectedMemberRoute.distance
-                      )}
-                    </div>
-                  </div>
-
-                  <div
-                    style={{
-                      padding: "9px",
-                      background:
-                        "rgba(255,255,255,0.05)",
-                      border:
-                        "1px solid rgba(255,255,255,0.07)",
-                      borderRadius: "8px",
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: "10px",
-                        color: "#8d98ad",
-                        marginBottom: "3px",
-                      }}
-                    >
-                      ETA
-                    </div>
-
-                    <div
-                      style={{
-                        fontSize: "14px",
-                        fontWeight: 700,
-                      }}
-                    >
-                      {formatDuration(
-                        selectedMemberRoute.duration
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )}
+            <button
+              type="button"
+              className="members-panel-collapse"
+              onClick={() => setMembersPanelOpen(false)}
+              aria-label="Hide members"
+              title="Hide members"
+            >
+              ˄
+            </button>
           </div>
-        )}
-      </div>
+
+          {/* ----------------------------------------------
+        MEMBER LIST
+    ---------------------------------------------- */}
+
+          <div className="members-list">
+            {Object.entries(members).map(([id, member]) => {
+              const isSelected = id === selectedMemberId;
+
+              const hasDestination = Boolean(member.destination);
+
+              return (
+                <div
+                  className={
+                    isSelected
+                      ? "member-row premium-member-row selected"
+                      : "member-row premium-member-row"
+                  }
+                  key={id}
+                  onClick={() => selectMember(id)}
+                >
+                  {/* PROFILE IMAGE */}
+
+                  <div className="premium-member-avatar">
+                    {member.profileImage ? (
+                      <img
+                        src={member.profileImage}
+                        alt={member.name || "Member"}
+                      />
+                    ) : (
+                      <span>{getInitialAvatar(member.name)}</span>
+                    )}
+
+                    {/* ONLINE DOT */}
+
+                    <span
+                      className={
+                        member.online
+                          ? "member-online-dot online"
+                          : "member-online-dot offline"
+                      }
+                    />
+                  </div>
+
+                  {/* MEMBER INFO */}
+
+                  <div className="premium-member-info">
+                    <div className="premium-member-name">
+                      <span>{member.name || "Member"}</span>
+
+                      {id === memberId && (
+                        <span className="premium-you-badge">YOU</span>
+                      )}
+                    </div>
+
+                    <div
+                      className={
+                        member.online
+                          ? "premium-member-status online-text"
+                          : "premium-member-status"
+                      }
+                    >
+                      {member.online ? "Online" : "Offline"}
+                    </div>
+                  </div>
+
+                  {/* DESTINATION */}
+
+                  {hasDestination && (
+                    <div
+                      className="member-destination-indicator"
+                      title="Destination set"
+                    >
+                      <span>⌖</span>
+                    </div>
+                  )}
+
+                  {/* SELECTED ARROW */}
+
+                  {isSelected && <div className="member-selected-arrow">›</div>}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* ----------------------------------------------
+        SELECTED MEMBER DETAILS
+    ---------------------------------------------- */}
+
+          {selectedMember && (
+            <div className="selected-member-card">
+              <div className="selected-member-card-header">
+                <span>SELECTED MEMBER</span>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedMemberId(null);
+                    setSelectedMemberRoute(null);
+                    setLoadingMemberRoute(false);
+                  }}
+                >
+                  ×
+                </button>
+              </div>
+
+              <div className="selected-member-main">
+                <MemberAvatar member={selectedMember} size={46} />
+
+                <div>
+                  <div className="selected-member-name">
+                    {selectedMember.name}
+                  </div>
+
+                  <div
+                    className={
+                      selectedMember.online
+                        ? "selected-member-status online-text"
+                        : "selected-member-status"
+                    }
+                  >
+                    ● {selectedMember.online ? "Online" : "Offline"}
+                  </div>
+                </div>
+              </div>
+
+              {loadingMemberRoute && (
+                <div className="selected-member-loading">
+                  Calculating route...
+                </div>
+              )}
+
+              {!loadingMemberRoute && !selectedMember.destination && (
+                <div className="selected-member-empty">
+                  ⌖ No destination set
+                </div>
+              )}
+
+              {!loadingMemberRoute && selectedMemberRoute && (
+                <div className="selected-route-stats">
+                  <div className="selected-route-stat">
+                    <span>DISTANCE</span>
+
+                    <strong>
+                      {formatDistance(selectedMemberRoute.distance)}
+                    </strong>
+                  </div>
+
+                  <div className="selected-route-stat">
+                    <span>ETA</span>
+
+                    <strong>
+                      {formatDuration(selectedMemberRoute.duration)}
+                    </strong>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      ) : (
+        /* ==================================================
+      COLLAPSED MEMBERS BUTTON
+  ================================================== */
+
+        <button
+          type="button"
+          className="members-panel-collapsed"
+          onClick={() => setMembersPanelOpen(true)}
+          aria-label="Show members"
+        >
+          <span className="collapsed-members-icon">👥</span>
+
+          <span className="collapsed-members-count">
+            {Object.keys(members).length}
+          </span>
+        </button>
+      )}
 
       {/* ==================================================
           BOTTOM SECTION
@@ -1497,6 +1507,8 @@ function Room() {
       <BottomSection
         followMe={followMe}
         setFollowMe={setFollowMe}
+        meshEnabled={meshEnabled}
+        setMeshEnabled={setMeshEnabled}
         goToMyLocation={goToMyLocation}
         copyInviteLink={copyInviteLink}
         selectedDestination={selectedDestination}
@@ -1511,9 +1523,7 @@ function Room() {
       <button
         className="terrain-button"
         onClick={() => {
-          alert(
-            "Terrain / Satellite mode will be added next."
-          );
+          alert("Terrain / Satellite mode will be added next.");
         }}
       >
         🗺 Terrain
@@ -1523,12 +1533,7 @@ function Room() {
           MAP
       ================================================== */}
 
-      <MapContainer
-        center={[22.5726, 88.3639]}
-        zoom={13}
-        className="room-map"
-      >
-
+      <MapContainer center={[22.5726, 88.3639]} zoom={13} className="room-map">
         {/* ----------------------------------------------
             MAP CONTROLLERS
         ---------------------------------------------- */}
@@ -1544,7 +1549,7 @@ function Room() {
         ---------------------------------------------- */}
 
         <TileLayer
-          attribution='&copy; OpenStreetMap contributors &copy; CARTO'
+          attribution="&copy; OpenStreetMap contributors &copy; CARTO"
           url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
           subdomains="abcd"
           maxZoom={20}
@@ -1561,251 +1566,304 @@ function Room() {
         />
 
         {/* ----------------------------------------------
-            SELECTED MEMBER ROUTE
-        ---------------------------------------------- */}
+    MESH
+---------------------------------------------- */}
 
-        {selectedMemberRoute && (
-          <Polyline
-            positions={
-              selectedMemberRoute.coordinates
+        {meshEnabled &&
+          (() => {
+            const validMembers = Object.entries(members).filter(
+              ([id, member]) => {
+                if (!member?.location) {
+                  return false;
+                }
+
+                const lat = Number(member.location.lat);
+                const lng = Number(member.location.lng);
+
+                return Number.isFinite(lat) && Number.isFinite(lng);
+              },
+            );
+
+            const meshLines = [];
+
+            for (let i = 0; i < validMembers.length; i++) {
+              for (let j = i + 1; j < validMembers.length; j++) {
+                const [idA, memberA] = validMembers[i];
+                const [idB, memberB] = validMembers[j];
+
+                const latA = Number(memberA.location.lat);
+                const lngA = Number(memberA.location.lng);
+
+                const latB = Number(memberB.location.lat);
+                const lngB = Number(memberB.location.lng);
+
+                const distance = getDistanceMeters(latA, lngA, latB, lngB);
+
+                const middleLat = (latA + latB) / 2;
+
+                const middleLng = (lngA + lngB) / 2;
+
+                meshLines.push(
+                  <Polyline
+                    key={`mesh-${idA}-${idB}`}
+                    positions={[
+                      [latA, lngA],
+                      [latB, lngB],
+                    ]}
+                    pathOptions={{
+                      color: "#67e8f9",
+                      weight: 1,
+                      opacity: 0.65,
+                      dashArray: "2 6",
+                    }}
+                  >
+                    <Tooltip
+                      permanent
+                      direction="center"
+                      className="mesh-distance-label"
+                    >
+                      {formatDistance(distance)}
+                    </Tooltip>
+                  </Polyline>,
+                );
+              }
             }
-            pathOptions={{
-              color: "#6366f1",
-              weight: 5,
-              opacity: 0.85,
-            }}
-          />
-        )}
 
+            return meshLines;
+          })()}
+
+        {/* ----------------------------------------------
+    ALL MEMBER → ALL DESTINATION ROUTES
+---------------------------------------------- */}
+
+        {memberRoutes.map((route, index) => {
+          if (!route?.coordinates?.length) {
+            return null;
+          }
+
+          const isSelected = route.memberId === selectedMemberId;
+
+          const routeColor = getRouteColor(route.memberId, members);
+
+          return (
+            <Polyline
+              key={
+                `route-${route.memberId}-` +
+                `${route.destinationMemberId}-${index}`
+              }
+              positions={route.coordinates}
+              pathOptions={{
+                color: routeColor,
+
+                weight: isSelected ? 6 : 3,
+
+                opacity: isSelected ? 0.95 : 0.55,
+
+                lineCap: "round",
+
+                lineJoin: "round",
+
+                className: isSelected ? "victo-route-selected" : "victo-route",
+              }}
+            >
+              <Tooltip sticky className="victo-route-tooltip">
+                {members[route.memberId]?.name || "Member"} →{" "}
+                {members[route.destinationMemberId]?.name || "Destination"}
+                <br />
+                {formatDistance(route.distance)}
+                {" • "}
+                {formatDuration(route.duration)}
+              </Tooltip>
+            </Polyline>
+          );
+        })}
         {/* ----------------------------------------------
             MEMBER LOCATIONS
         ---------------------------------------------- */}
 
-        {Object.entries(members).map(
-          ([id, member]) => {
-            if (!member.location) {
-              return null;
-            }
+        {Object.entries(members).map(([id, member]) => {
+          if (!member.location) {
+            return null;
+          }
 
-            const lat = Number(
-              member.location.lat
-            );
+          const lat = Number(member.location.lat);
 
-            const lng = Number(
-              member.location.lng
-            );
+          const lng = Number(member.location.lng);
 
-            if (
-              !Number.isFinite(lat) ||
-              !Number.isFinite(lng)
-            ) {
-              return null;
-            }
+          if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+            return null;
+          }
 
-            const isMe = id === memberId;
+          const isMe = id === memberId;
 
-            const avatarHtml =
-              member.profileImage
-                ? `
-                    <img
-                      src="${member.profileImage}"
-                      alt=""
-                      style="
-                        width:42px;
-                        height:42px;
-                        object-fit:cover;
-                        border-radius:50%;
-                        border:${
-                          isMe
-                            ? "3px solid #6366f1"
-                            : "3px solid white"
-                        };
-                        box-shadow:
-                          0 3px 12px
-                          rgba(0,0,0,0.35);
-                      "
-                    />
-                  `
-                : `
-                    <div
-                      style="
-                        width:42px;
-                        height:42px;
-                        display:flex;
-                        align-items:center;
-                        justify-content:center;
-                        border-radius:50%;
-                        background:#202938;
-                        border:${
-                          isMe
-                            ? "3px solid #6366f1"
-                            : "3px solid white"
-                        };
-                        box-shadow:
-                          0 3px 12px
-                          rgba(0,0,0,0.35);
-                        font-size:22px;
-                      "
-                    >
-                      ${getInitialAvatar(member.name)}
-                    </div>
-                  `;
+          // const avatarHtml = member.profileImage
+          const markerColor = isMe ? "#22d3ee" : getRouteColor(id, members);
 
-            return (
-              <Marker
-                key={`member-${id}`}
-                position={[lat, lng]}
-                icon={divIcon({
-                  className:
-                    "victo-member-marker",
+          const avatarHtml = member.profileImage
+            ? `
+      <div
+        class="victo-live-marker ${isMe ? "victo-live-marker-me" : ""}"
+        style="--marker-color:${markerColor};"
+      >
 
-                  html: `
-                    <div
-                      style="
-                        width:42px;
-                        height:42px;
-                        position:relative;
-                      "
-                    >
-                      ${avatarHtml}
+        ${
+          isMe
+            ? `
+              <div class="victo-live-pulse"></div>
+              <div class="victo-live-pulse pulse-delay"></div>
+            `
+            : ""
+        }
 
-                      <div
-                        style="
-                          position:absolute;
-                          right:-1px;
-                          bottom:-1px;
-                          width:11px;
-                          height:11px;
-                          border-radius:50%;
-                          background:${
-                            member.online
-                              ? "#22c55e"
-                              : "#6b7280"
-                          };
-                          border:
-                            2px solid white;
-                          box-sizing:border-box;
-                        "
-                      ></div>
-                    </div>
-                  `,
+        <div class="victo-live-avatar">
+          <img
+            src="${member.profileImage}"
+            alt=""
+          />
+        </div>
 
-                  iconSize: [42, 42],
+        <div
+          class="victo-live-status"
+          style="
+            background:${member.online ? "#22c55e" : "#6b7280"};
+          "
+        ></div>
 
-                  iconAnchor: [21, 21],
-                })}
-              >
-                <Popup>
+      </div>
+    `
+            : `
+      <div
+        class="victo-live-marker ${isMe ? "victo-live-marker-me" : ""}"
+        style="--marker-color:${markerColor};"
+      >
+
+        ${
+          isMe
+            ? `
+              <div class="victo-live-pulse"></div>
+              <div class="victo-live-pulse pulse-delay"></div>
+            `
+            : ""
+        }
+
+        <div
+          class="victo-live-avatar victo-live-avatar-emoji"
+        >
+          ${getInitialAvatar(member.name)}
+        </div>
+
+        <div
+          class="victo-live-status"
+          style="
+            background:${member.online ? "#22c55e" : "#6b7280"};
+          "
+        ></div>
+
+      </div>
+    `;
+
+          return (
+            <Marker
+              key={`member-${id}`}
+              position={[lat, lng]}
+              icon={divIcon({
+                className: "victo-member-marker",
+
+                html: avatarHtml,
+
+                iconSize: [58, 58],
+
+                iconAnchor: [29, 29],
+              })}
+            >
+              <Popup>
+                <div
+                  style={{
+                    minWidth: "120px",
+                  }}
+                >
                   <div
                     style={{
-                      minWidth: "120px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
                     }}
                   >
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "8px",
-                      }}
-                    >
-                      <MemberAvatar
-                        member={member}
-                        size={30}
-                      />
+                    <MemberAvatar member={member} size={30} />
 
-                      <div>
-                        <b>
-                          {member.name}
-                          {isMe
-                            ? " (You)"
-                            : ""}
-                        </b>
+                    <div>
+                      <b>
+                        {member.name}
+                        {isMe ? " (You)" : ""}
+                      </b>
 
-                        <div
-                          style={{
-                            fontSize: "11px",
-                            color:
-                              member.online
-                                ? "#16a34a"
-                                : "#6b7280",
-                          }}
-                        >
-                          ●{" "}
-                          {member.online
-                            ? "Online"
-                            : "Offline"}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div
-                      style={{
-                        marginTop: "6px",
-                        fontSize: "12px",
-                      }}
-                    >
-                      Live Location
-                    </div>
-
-                    {member.destination && (
                       <div
                         style={{
-                          marginTop: "5px",
                           fontSize: "11px",
-                          color: "#6366f1",
+                          color: member.online ? "#16a34a" : "#6b7280",
                         }}
                       >
-                        📍 Destination set
+                        ● {member.online ? "Online" : "Offline"}
                       </div>
-                    )}
+                    </div>
                   </div>
-                </Popup>
-              </Marker>
-            );
-          }
-        )}
+
+                  <div
+                    style={{
+                      marginTop: "6px",
+                      fontSize: "12px",
+                    }}
+                  >
+                    Live Location
+                  </div>
+
+                  {member.destination && (
+                    <div
+                      style={{
+                        marginTop: "5px",
+                        fontSize: "11px",
+                        color: "#6366f1",
+                      }}
+                    >
+                      📍 Destination set
+                    </div>
+                  )}
+                </div>
+              </Popup>
+            </Marker>
+          );
+        })}
 
         {/* ----------------------------------------------
             SAVED DESTINATIONS
         ---------------------------------------------- */}
 
-        {Object.entries(members).map(
-          ([id, member]) => {
-            if (!member.destination) {
-              return null;
-            }
-
-            return (
-              <DestinationMarker
-                key={`destination-${id}`}
-                id={id}
-                member={member}
-                memberId={memberId}
-                onRemove={removeDestination}
-              />
-            );
+        {Object.entries(members).map(([id, member]) => {
+          if (!member.destination) {
+            return null;
           }
-        )}
+
+          return (
+            <DestinationMarker
+              key={`destination-${id}`}
+              id={id}
+              member={member}
+              memberId={memberId}
+              onRemove={removeDestination}
+            />
+          );
+        })}
 
         {/* ----------------------------------------------
             TEMPORARY DESTINATION
         ---------------------------------------------- */}
 
         {selectedDestination && (
-          <Marker
-            position={[
-              selectedDestination.lat,
-              selectedDestination.lng,
-            ]}
-          >
+          <Marker position={[selectedDestination.lat, selectedDestination.lng]}>
             <Popup>
               <b>New Destination</b>
-
               <br />
-
-              Click{" "}
-              <b>"Set Destination"</b>{" "}
-              to save it.
+              Click <b>"Set Destination"</b> to save it.
             </Popup>
           </Marker>
         )}

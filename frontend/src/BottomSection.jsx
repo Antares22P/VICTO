@@ -3,6 +3,8 @@ import React from "react";
 function BottomSection({
   followMe,
   setFollowMe,
+  meshEnabled,
+  setMeshEnabled,
   goToMyLocation,
   fitAllMembers,
   copyInviteLink,
@@ -80,6 +82,23 @@ function BottomSection({
             ? "◉ Following"
             : "◎ Follow"}
         </button>
+
+        {/* ----------------------------------------------
+    MESH
+---------------------------------------------- */}
+
+<button
+  className={
+    meshEnabled
+      ? "control-button active mesh-active"
+      : "control-button"
+  }
+  onClick={() =>
+    setMeshEnabled((previous) => !previous)
+  }
+>
+  {meshEnabled ? "◉ Mesh" : "◎ Mesh"}
+</button>
 
         {/* ----------------------------------------------
             INVITE

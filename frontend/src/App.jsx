@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Room from "./Room";
-
+import "./App.css";
 function App() {
 
   const API_URL = import.meta.env.VITE_API_URL;
@@ -236,169 +236,275 @@ function App() {
   // MAIN PAGE
   // ==========================================
 
-  return (
+  // ==========================================
+// MAIN PAGE
+// ==========================================
 
-    <div
-      style={{
+return (
+  <div className="home-page">
 
-        padding: "40px",
+    {/* BACKGROUND */}
+    <div className="home-glow home-glow-one"></div>
+    <div className="home-glow home-glow-two"></div>
 
-        maxWidth: "500px",
+    {/* HEADER */}
+    <header className="home-header">
+      <div className="home-logo">
+        <div className="home-logo-mark">V</div>
 
-        margin: "auto",
+        <div>
+          <div className="home-brand">Victo</div>
+          <div className="home-tagline">
+            Live together. Stay connected.
+          </div>
+        </div>
+      </div>
 
-      }}
-    >
-
-      <h1>
-        Victo
-      </h1>
-
-      <p>
+      <div className="home-status">
+        <span className="home-status-dot"></span>
         Live location sharing
-      </p>
+      </div>
+    </header>
 
 
-      {/* ======================================
-          HOME
-      ====================================== */}
+    {/* MAIN */}
+    <main className="home-content">
 
       {!mode && (
+        <section className="home-hero">
 
-        <>
+          <div className="hero-badge">
+            <span>●</span>
+            REAL-TIME LOCATION
+          </div>
 
-          <button
-            onClick={() =>
-              setMode("create")
-            }
-          >
-            Create Room
-          </button>
+          <h1>
+            Stay together,
+            <br />
+            <span>wherever you are.</span>
+          </h1>
+
+          <p className="hero-description">
+            Create a private room and share your live location
+            with the people who matter.
+          </p>
 
 
-          <button
-            onClick={() =>
-              setMode("join")
-            }
+          {/* ACTION CARDS */}
+          <div className="home-actions">
 
-            style={{
-              marginLeft: "10px",
-            }}
-          >
-            Join Room
-          </button>
+            {/* CREATE */}
+            <button
+              className="home-action-card create-card"
+              onClick={() => setMode("create")}
+            >
+              <div className="action-icon">
+                +
+              </div>
 
-        </>
+              <div className="action-content">
+                <div className="action-title">
+                  Create a room
+                </div>
 
+                <div className="action-description">
+                  Start a new private location room
+                </div>
+              </div>
+
+              <div className="action-arrow">
+                →
+              </div>
+            </button>
+
+
+            {/* JOIN */}
+            <button
+              className="home-action-card"
+              onClick={() => setMode("join")}
+            >
+              <div className="action-icon join-icon">
+                ↗
+              </div>
+
+              <div className="action-content">
+                <div className="action-title">
+                  Join a room
+                </div>
+
+                <div className="action-description">
+                  Enter a room code to join your group
+                </div>
+              </div>
+
+              <div className="action-arrow">
+                →
+              </div>
+            </button>
+
+          </div>
+
+        </section>
       )}
 
 
       {/* ======================================
-          CREATE
+          CREATE ROOM
       ====================================== */}
 
       {mode === "create" && (
-
-        <div>
-
-          <h2>
-            Create Room
-          </h2>
-
-
-          <input
-            placeholder="Your name"
-            value={name}
-            onChange={(e) =>
-              setName(e.target.value)
-            }
-          />
-
-
-          <br />
-          <br />
-
-
-          <input
-            placeholder="Room name"
-            value={roomName}
-            onChange={(e) =>
-              setRoomName(
-                e.target.value
-              )
-            }
-          />
-
-
-          <br />
-          <br />
-
+        <section className="room-form-card">
 
           <button
-            onClick={createRoom}
+            className="back-button"
+            onClick={() => setMode(null)}
           >
-            Create
+            ← Back
           </button>
 
-        </div>
+          <div className="form-icon">
+            +
+          </div>
 
+          <div className="form-heading">
+            Create a room
+          </div>
+
+          <div className="form-subheading">
+            Set up your private location space.
+          </div>
+
+
+          <div className="form-fields">
+
+            <label>
+              Your name
+            </label>
+
+            <input
+              placeholder="Enter your name"
+              value={name}
+              onChange={(e) =>
+                setName(e.target.value)
+              }
+              autoComplete="name"
+            />
+
+
+            <label>
+              Room name
+            </label>
+
+            <input
+              placeholder="e.g. Weekend Trip"
+              value={roomName}
+              onChange={(e) =>
+                setRoomName(e.target.value)
+              }
+            />
+
+
+            <button
+              className="primary-form-button"
+              onClick={createRoom}
+            >
+              Create Room
+              <span>→</span>
+            </button>
+
+          </div>
+
+        </section>
       )}
 
 
       {/* ======================================
-          JOIN
+          JOIN ROOM
       ====================================== */}
 
       {mode === "join" && (
-
-        <div>
-
-          <h2>
-            Join Room
-          </h2>
-
-
-          <input
-            placeholder="Your name"
-            value={name}
-            onChange={(e) =>
-              setName(e.target.value)
-            }
-          />
-
-
-          <br />
-          <br />
-
-
-          <input
-            placeholder="Room code"
-            value={roomCode}
-            onChange={(e) =>
-              setRoomCode(
-                e.target.value.toUpperCase()
-              )
-            }
-          />
-
-
-          <br />
-          <br />
-
+        <section className="room-form-card">
 
           <button
-            onClick={joinRoom}
+            className="back-button"
+            onClick={() => setMode(null)}
           >
-            Join
+            ← Back
           </button>
 
-        </div>
+          <div className="form-icon join-form-icon">
+            ↗
+          </div>
 
+          <div className="form-heading">
+            Join a room
+          </div>
+
+          <div className="form-subheading">
+            Enter the details shared with you.
+          </div>
+
+
+          <div className="form-fields">
+
+            <label>
+              Your name
+            </label>
+
+            <input
+              placeholder="Enter your name"
+              value={name}
+              onChange={(e) =>
+                setName(e.target.value)
+              }
+              autoComplete="name"
+            />
+
+
+            <label>
+              Room code
+            </label>
+
+            <input
+              className="room-code-input"
+              placeholder="XXXXXX"
+              value={roomCode}
+              maxLength={10}
+              onChange={(e) =>
+                setRoomCode(
+                  e.target.value.toUpperCase()
+                )
+              }
+            />
+
+
+            <button
+              className="primary-form-button"
+              onClick={joinRoom}
+            >
+              Join Room
+              <span>→</span>
+            </button>
+
+          </div>
+
+        </section>
       )}
 
-    </div>
+    </main>
 
-  );
+
+    {/* FOOTER */}
+    <footer className="home-footer">
+      <span>Private rooms</span>
+      <span>•</span>
+      <span>Real-time sharing</span>
+      <span>•</span>
+      <span>Built with Victo</span>
+    </footer>
+
+  </div>
+);
 }
 
 export default App;

@@ -19,7 +19,6 @@ body {
   overflow: hidden;
 }
 
-
 /* =========================================================
    ROOM APP
 ========================================================= */
@@ -46,7 +45,6 @@ body {
     sans-serif;
 }
 
-
 /* =========================================================
    MAP
 ========================================================= */
@@ -71,19 +69,16 @@ body {
     sans-serif;
 }
 
-
 /* =========================================================
    TOP BAR
 ========================================================= */
 
 .top-bar {
   position: absolute;
-
   z-index: 1000;
 
-  top: 16px;
-  left: 16px;
-  right: 16px;
+  top: 12px;
+  left: 12px;
 
   min-height: 58px;
 
@@ -91,27 +86,29 @@ body {
   align-items: center;
   justify-content: space-between;
 
-  padding: 10px 18px;
+  padding: 9px 16px;
 
-  background:
-    rgba(10, 15, 24, 0.88);
+  background: linear-gradient(
+    135deg,
+    rgba(12, 16, 28, 0.94),
+    rgba(17, 13, 30, 0.88)
+  );
 
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
 
-  border:
-    1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 
-  border-radius: 14px;
+  border-radius: 18px;
 
   color: white;
 
   box-shadow:
-    0 8px 30px rgba(0, 0, 0, 0.25);
+    0 18px 45px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
 
   pointer-events: auto;
 }
-
 
 /* =========================================================
    ROOM INFO
@@ -129,74 +126,115 @@ body {
 }
 
 .room-brand {
+  position: relative;
+
   flex-shrink: 0;
 
   font-size: 18px;
+  font-weight: 900;
 
-  font-weight: 800;
-
-  letter-spacing: -0.5px;
+  letter-spacing: 1px;
 
   color: white;
+
+  text-transform: uppercase;
+
+  text-shadow: 0 0 20px rgba(99, 102, 241, 0.35);
+}
+
+.room-brand::before {
+  content: "";
+
+  display: inline-block;
+
+  width: 8px;
+  height: 8px;
+
+  margin-right: 8px;
+
+  border-radius: 50%;
+
+  background: #34d399;
+
+  box-shadow:
+    0 0 0 4px rgba(52, 211, 153, 0.1),
+    0 0 14px rgba(52, 211, 153, 0.65);
+
+  vertical-align: 2px;
 }
 
 .room-detail {
-  color: #aab3c5;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+
+  color: #7f8aa3;
+
+  font-size: 11px;
+  font-weight: 600;
+
+  letter-spacing: 0.5px;
 
   white-space: nowrap;
+
+  text-transform: uppercase;
 }
 
 .room-detail b {
-  color: white;
-}
+  color: #e8ecf7;
 
+  font-weight: 800;
+}
 
 /* =========================================================
    MEMBERS PANEL
 ========================================================= */
 
-.members-panel {
+/* .members-panel {
   position: absolute;
 
   z-index: 1000;
 
-  top: 90px;
-  right: 16px;
+  top: 84px;
+  right: 12px;
 
-  width: 270px;
+  width: 350px;
 
-  max-width:
-    calc(100vw - 32px);
+  max-width: calc(100vw - 24px);
 
-  max-height:
-    calc(100vh - 180px);
+  max-height: calc(100vh - 160px);
 
-  padding: 16px;
+  padding: 18px;
 
   overflow-y: auto;
 
   background:
-    rgba(10, 15, 24, 0.9);
+    linear-gradient(
+      145deg,
+      rgba(15, 18, 31, 0.94),
+      rgba(12, 14, 24, 0.90)
+    );
 
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
 
   border:
-    1px solid rgba(255, 255, 255, 0.1);
+    1px solid rgba(255, 255, 255, 0.09);
 
-  border-radius: 14px;
+  border-radius: 20px;
 
   color: white;
 
   box-shadow:
-    0 8px 30px rgba(0, 0, 0, 0.25);
+    0 24px 60px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
 
   scrollbar-width: thin;
 
   scrollbar-color:
-    rgba(255, 255, 255, 0.16)
+    rgba(255, 255, 255, 0.12)
     transparent;
-}
+} */
 
 .members-panel::-webkit-scrollbar {
   width: 5px;
@@ -207,99 +245,152 @@ body {
 }
 
 .members-panel::-webkit-scrollbar-thumb {
-  background:
-    rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.16);
 
   border-radius: 10px;
 }
-
 
 /* =========================================================
    MEMBERS TITLE
 ========================================================= */
 
 .members-title {
-  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  font-size: 10px;
 
   font-weight: 800;
 
-  letter-spacing: 1.5px;
+  letter-spacing: 2px;
 
-  color: #8d98ad;
+  color: #7f8aa3;
 
-  margin-bottom: 12px;
+  margin-bottom: 14px;
+
+  text-transform: uppercase;
 }
 
+.members-title::after {
+  content: "LIVE";
+
+  padding: 4px 7px;
+
+  border-radius: 999px;
+
+  background: rgba(52, 211, 153, 0.08);
+
+  border: 1px solid rgba(52, 211, 153, 0.16);
+
+  color: #34d399;
+
+  font-size: 8px;
+
+  letter-spacing: 1px;
+}
 
 /* =========================================================
    MEMBER ROW
 ========================================================= */
 
 .member-row {
-  display: flex;
+  position: relative;
 
+  display: flex;
   align-items: center;
 
-  gap: 10px;
+  gap: 11px;
 
   min-width: 0;
 
   cursor: pointer;
 
-  border-radius: 9px;
+  border-radius: 14px;
 
-  padding: 8px;
+  padding: 11px;
 
-  margin: 2px -8px;
+  margin: 5px 0;
 
-  background: transparent;
+  background: rgba(255, 255, 255, 0.025);
 
-  border:
-    1px solid transparent;
+  border: 1px solid rgba(255, 255, 255, 0.055);
 
   transition:
     background 0.2s ease,
     border-color 0.2s ease,
-    transform 0.2s ease;
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .member-row:hover {
-  background:
-    rgba(255, 255, 255, 0.05);
+  background: rgba(99, 102, 241, 0.08);
 
-  border-color:
-    rgba(255, 255, 255, 0.06);
+  border-color: rgba(99, 102, 241, 0.2);
+
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.18);
+
+  transform: translateY(-1px);
 }
 
 .member-row:active {
   transform: scale(0.985);
 }
 
+.member-row:hover {
+  background: rgba(255, 255, 255, 0.05);
+
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+.member-row:active {
+  transform: scale(0.985);
+}
 
 /* =========================================================
    SELECTED MEMBER ROW
 ========================================================= */
 
 .member-row-selected {
-  background:
-    rgba(99, 102, 241, 0.14);
+  background: linear-gradient(
+    135deg,
+    rgba(99, 102, 241, 0.16),
+    rgba(34, 211, 238, 0.06)
+  );
 
-  border-color:
-    rgba(99, 102, 241, 0.3);
+  border-color: rgba(99, 102, 241, 0.38);
+
+  box-shadow:
+    inset 0 0 20px rgba(99, 102, 241, 0.05),
+    0 8px 25px rgba(0, 0, 0, 0.18);
+}
+
+.member-row-selected::before {
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+
+  width: 3px;
+  height: 22px;
+
+  border-radius: 0 4px 4px 0;
+
+  background: linear-gradient(to bottom, #22d3ee, #6366f1);
+
+  box-shadow: 0 0 12px rgba(34, 211, 238, 0.5);
 }
 
 .member-row-selected:hover {
-  background:
-    rgba(99, 102, 241, 0.18);
+  background: rgba(99, 102, 241, 0.18);
 }
-
 
 /*
    The current Room.jsx also uses inline selected
    styles, so this class remains available for
    future cleanup.
 */
-
 
 /* =========================================================
    MEMBER AVATAR / MARKER
@@ -316,7 +407,6 @@ body {
 .victo-member-marker > div {
   cursor: pointer;
 }
-
 
 /* =========================================================
    MEMBER NAME
@@ -338,7 +428,6 @@ body {
   white-space: nowrap;
 }
 
-
 /* =========================================================
    MEMBER STATUS
 ========================================================= */
@@ -352,7 +441,6 @@ body {
 
   color: #6b7280;
 }
-
 
 /* =========================================================
    MEMBER DESTINATION INDICATOR
@@ -372,14 +460,12 @@ body {
 
   border-radius: 7px;
 
-  background:
-    rgba(99, 102, 241, 0.1);
+  background: rgba(99, 102, 241, 0.1);
 
   color: #a5b4fc;
 
   font-size: 13px;
 }
-
 
 /* =========================================================
    SELECTED MEMBER DETAILS
@@ -390,10 +476,8 @@ body {
 
   padding-top: 12px;
 
-  border-top:
-    1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
-
 
 /* =========================================================
    SELECTED MEMBER TITLE
@@ -410,7 +494,6 @@ body {
 
   color: #8d98ad;
 }
-
 
 /* =========================================================
    SELECTED MEMBER HEADER
@@ -452,7 +535,6 @@ body {
   color: #4ade80;
 }
 
-
 /* =========================================================
    SELECTED MEMBER ROUTE DATA
 ========================================================= */
@@ -460,12 +542,10 @@ body {
 .selected-member-route-data {
   display: grid;
 
-  grid-template-columns:
-    repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 
   gap: 7px;
 }
-
 
 /* =========================================================
    ROUTE STAT
@@ -474,11 +554,9 @@ body {
 .selected-member-route-stat {
   padding: 9px;
 
-  background:
-    rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.05);
 
-  border:
-    1px solid rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.07);
 
   border-radius: 8px;
 }
@@ -499,7 +577,6 @@ body {
   color: white;
 }
 
-
 /* =========================================================
    ROUTE LOADING
 ========================================================= */
@@ -511,7 +588,6 @@ body {
 
   color: #aab3c5;
 }
-
 
 /* =========================================================
    NO DESTINATION
@@ -525,16 +601,13 @@ body {
   color: #8d98ad;
 }
 
-
 /* =========================================================
    SELECTED MEMBER ROUTE LINE
 ========================================================= */
 
 .room-map .leaflet-overlay-pane path {
-  transition:
-    opacity 0.2s ease;
+  transition: opacity 0.2s ease;
 }
-
 
 /* =========================================================
    BOTTOM CONTROLS
@@ -546,59 +619,91 @@ body {
   z-index: 1000;
 
   left: 50%;
+  bottom: 18px;
 
-  bottom: 24px;
-
-  transform:
-    translateX(-50%);
+  transform: translateX(-50%);
 
   display: flex;
-
   align-items: center;
 
-  gap: 8px;
+  gap: 4px;
 
-  padding: 8px;
+  padding: 6px;
 
-  background:
-    rgba(10, 15, 24, 0.92);
+  background: linear-gradient(
+    135deg,
+    rgba(14, 17, 29, 0.96),
+    rgba(18, 15, 31, 0.94)
+  );
 
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
 
-  border:
-    1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 
-  border-radius: 14px;
+  border-radius: 18px;
 
   box-shadow:
-    0 8px 30px rgba(0, 0, 0, 0.3);
+    0 20px 50px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
 
-  max-width:
-    calc(100vw - 32px);
+  max-width: calc(100vw - 24px);
 }
 
+/* =========================================================
+   MESH
+========================================================= */
+
+.mesh-distance-label {
+  background: rgba(9, 12, 21, 0.88) !important;
+
+  border: 1px solid rgba(103, 232, 249, 0.22) !important;
+
+  border-radius: 999px !important;
+
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3) !important;
+
+  color: #67e8f9 !important;
+
+  font-size: 9px !important;
+
+  font-weight: 800 !important;
+
+  letter-spacing: 0.3px;
+
+  padding: 3px 7px !important;
+
+  backdrop-filter: blur(10px);
+
+  white-space: nowrap;
+}
+
+.mesh-distance-label::before {
+  display: none !important;
+}
 
 /* =========================================================
    CONTROL BUTTON
 ========================================================= */
 
 .control-button {
-  border: none;
+  border: 1px solid transparent;
 
-  min-height: 40px;
+  min-height: 42px;
 
-  padding: 10px 15px;
+  padding: 10px 14px;
 
-  border-radius: 9px;
+  border-radius: 12px;
 
-  background: #1a2230;
+  background: transparent;
 
-  color: white;
+  color: #8e99ae;
 
-  font-size: 13px;
+  font-size: 12px;
 
-  font-weight: 600;
+  font-weight: 700;
+
+  letter-spacing: 0.2px;
 
   white-space: nowrap;
 
@@ -606,8 +711,22 @@ body {
 
   transition:
     background 0.2s ease,
+    color 0.2s ease,
     transform 0.2s ease,
-    opacity 0.2s ease;
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.control-button:hover {
+  background: rgba(255, 255, 255, 0.06);
+
+  color: white;
+
+  border-color: rgba(255, 255, 255, 0.07);
+}
+
+.control-button:active {
+  transform: scale(0.96);
 }
 
 .control-button:hover {
@@ -619,25 +738,42 @@ body {
 }
 
 .control-button.active {
-  background: #111827;
+  background: linear-gradient(
+    135deg,
+    rgba(99, 102, 241, 0.2),
+    rgba(34, 211, 238, 0.08)
+  );
 
-  color: white;
+  color: #e5e7ff;
+
+  border-color: rgba(99, 102, 241, 0.3);
 
   box-shadow:
-    inset 0 0 0 1px
-    rgba(99, 102, 241, 0.35);
+    inset 0 0 20px rgba(99, 102, 241, 0.06),
+    0 0 18px rgba(99, 102, 241, 0.08);
 }
 
 .control-button.primary {
-  background: #6366f1;
+  position: relative;
+
+  background: linear-gradient(135deg, #06b6d4, #6366f1);
 
   color: white;
+
+  border: none;
+
+  box-shadow: 0 8px 22px rgba(99, 102, 241, 0.28);
 }
 
 .control-button.primary:hover {
-  background: #5558df;
-}
+  background: linear-gradient(135deg, #22d3ee, #818cf8);
 
+  color: white;
+
+  transform: translateY(-1px);
+
+  box-shadow: 0 10px 28px rgba(99, 102, 241, 0.38);
+}
 
 /* =========================================================
    DESTINATION ACTIONS
@@ -652,8 +788,7 @@ body {
 
   bottom: 92px;
 
-  transform:
-    translateX(-50%);
+  transform: translateX(-50%);
 
   display: flex;
 
@@ -663,24 +798,19 @@ body {
 
   padding: 8px;
 
-  background:
-    rgba(10, 15, 24, 0.94);
+  background: rgba(10, 15, 24, 0.94);
 
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
 
-  border:
-    1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 
   border-radius: 14px;
 
-  box-shadow:
-    0 8px 30px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
 
-  max-width:
-    calc(100vw - 32px);
+  max-width: calc(100vw - 32px);
 }
-
 
 /* =========================================================
    DESTINATION BUTTONS
@@ -735,7 +865,6 @@ body {
   transform: scale(0.97);
 }
 
-
 /* =========================================================
    DESTINATION MARKER
 ========================================================= */
@@ -747,7 +876,6 @@ body {
 
   overflow: visible !important;
 }
-
 
 /* =========================================================
    DESTINATION MARKER CONTAINER
@@ -762,7 +890,6 @@ body {
 
   pointer-events: auto;
 }
-
 
 /* =========================================================
    DESTINATION PIN
@@ -785,35 +912,26 @@ body {
 
   justify-content: center;
 
-  border-radius:
-    50% 50% 50% 0;
+  border-radius: 50% 50% 50% 0;
 
-  transform:
-    rotate(-45deg);
+  transform: rotate(-45deg);
 
   background: #f43f5e;
 
-  border:
-    3px solid rgba(255, 255, 255, 0.92);
+  border: 3px solid rgba(255, 255, 255, 0.92);
 
-  box-shadow:
-    0 5px 18px rgba(244, 63, 94, 0.45);
+  box-shadow: 0 5px 18px rgba(244, 63, 94, 0.45);
 
   transition:
     transform 0.2s ease,
     box-shadow 0.2s ease;
 }
 
-.victo-destination-marker:hover
-.victo-destination-pin {
-  transform:
-    rotate(-45deg)
-    scale(1.08);
+.victo-destination-marker:hover .victo-destination-pin {
+  transform: rotate(-45deg) scale(1.08);
 
-  box-shadow:
-    0 7px 22px rgba(244, 63, 94, 0.58);
+  box-shadow: 0 7px 22px rgba(244, 63, 94, 0.58);
 }
-
 
 /* =========================================================
    DESTINATION PIN INNER
@@ -828,7 +946,6 @@ body {
 
   background: white;
 }
-
 
 /* =========================================================
    DESTINATION LABEL
@@ -845,11 +962,9 @@ body {
 
   border-radius: 7px;
 
-  background:
-    rgba(10, 15, 25, 0.94);
+  background: rgba(10, 15, 25, 0.94);
 
-  border:
-    1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.12);
 
   color: #eef2ff;
 
@@ -861,10 +976,8 @@ body {
 
   white-space: nowrap;
 
-  box-shadow:
-    0 5px 18px rgba(0, 0, 0, 0.28);
+  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.28);
 }
-
 
 /* =========================================================
    REMOVE DESTINATION BUTTON
@@ -911,8 +1024,7 @@ body {
 
   visibility: hidden;
 
-  transform:
-    translateY(-4px);
+  transform: translateY(-4px);
 
   pointer-events: none;
 
@@ -922,23 +1034,19 @@ body {
     transform 0.16s ease,
     background 0.16s ease;
 
-  box-shadow:
-    0 5px 16px rgba(239, 68, 68, 0.32);
+  box-shadow: 0 5px 16px rgba(239, 68, 68, 0.32);
 }
-
 
 /* =========================================================
    SHOW REMOVE BUTTON ON HOVER
 ========================================================= */
 
-.victo-destination-marker:hover
-.victo-destination-remove {
+.victo-destination-marker:hover .victo-destination-remove {
   opacity: 1;
 
   visibility: visible;
 
-  transform:
-    translateY(0);
+  transform: translateY(0);
 
   pointer-events: auto;
 }
@@ -948,21 +1056,16 @@ body {
 }
 
 .victo-destination-remove:active {
-  transform:
-    translateY(0)
-    scale(0.96);
+  transform: translateY(0) scale(0.96);
 }
-
 
 /* =========================================================
    DESTINATION MARKER POPUP
 ========================================================= */
 
-.victo-destination-marker
-+ .leaflet-popup {
+.victo-destination-marker + .leaflet-popup {
   z-index: 2000;
 }
-
 
 /* =========================================================
    NEARBY MEMBER NOTIFICATION
@@ -977,14 +1080,11 @@ body {
 
   left: 50%;
 
-  transform:
-    translateX(-50%)
-    translateY(-8px);
+  transform: translateX(-50%) translateY(-8px);
 
   min-width: 300px;
 
-  max-width:
-    min(420px, calc(100vw - 32px));
+  max-width: min(420px, calc(100vw - 32px));
 
   display: flex;
 
@@ -996,26 +1096,19 @@ body {
 
   border-radius: 12px;
 
-  background:
-    rgba(12, 18, 30, 0.96);
+  background: rgba(12, 18, 30, 0.96);
 
-  border:
-    1px solid rgba(74, 222, 128, 0.38);
+  border: 1px solid rgba(74, 222, 128, 0.38);
 
-  box-shadow:
-    0 12px 35px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.35);
 
   color: #eef2ff;
 
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 
-  animation:
-    victoNearbyIn
-    0.25s ease
-    forwards;
+  animation: victoNearbyIn 0.25s ease forwards;
 }
-
 
 /* =========================================================
    NEARBY NOTIFICATION ICON
@@ -1036,15 +1129,12 @@ body {
 
   border-radius: 10px;
 
-  background:
-    rgba(74, 222, 128, 0.13);
+  background: rgba(74, 222, 128, 0.13);
 
-  border:
-    1px solid rgba(74, 222, 128, 0.12);
+  border: 1px solid rgba(74, 222, 128, 0.12);
 
   font-size: 17px;
 }
-
 
 /* =========================================================
    NEARBY NOTIFICATION CONTENT
@@ -1073,7 +1163,6 @@ body {
 .victo-nearby-notification-text b {
   color: white;
 }
-
 
 /* =========================================================
    NEARBY NOTIFICATION CLOSE
@@ -1114,12 +1203,10 @@ body {
 }
 
 .victo-nearby-notification-close:hover {
-  background:
-    rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.07);
 
   color: white;
 }
-
 
 /* =========================================================
    NEARBY NOTIFICATION ANIMATION
@@ -1129,22 +1216,15 @@ body {
   from {
     opacity: 0;
 
-    transform:
-      translateX(-50%)
-      translateY(-12px)
-      scale(0.97);
+    transform: translateX(-50%) translateY(-12px) scale(0.97);
   }
 
   to {
     opacity: 1;
 
-    transform:
-      translateX(-50%)
-      translateY(0)
-      scale(1);
+    transform: translateX(-50%) translateY(0) scale(1);
   }
 }
-
 
 /* =========================================================
    TERRAIN BUTTON
@@ -1163,13 +1243,11 @@ body {
 
   padding: 11px 15px;
 
-  border:
-    1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 
   border-radius: 10px;
 
-  background:
-    rgba(10, 15, 24, 0.9);
+  background: rgba(10, 15, 24, 0.9);
 
   color: white;
 
@@ -1188,14 +1266,12 @@ body {
 }
 
 .terrain-button:hover {
-  background:
-    rgba(25, 34, 48, 0.95);
+  background: rgba(25, 34, 48, 0.95);
 }
 
 .terrain-button:active {
   transform: scale(0.97);
 }
-
 
 /* =========================================================
    LEAFLET POPUP
@@ -1208,8 +1284,7 @@ body {
 
   color: #111827;
 
-  box-shadow:
-    0 8px 25px rgba(0, 0, 0, 0.22);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.22);
 }
 
 .leaflet-popup-content {
@@ -1228,7 +1303,6 @@ body {
   background: white;
 }
 
-
 /* =========================================================
    LEAFLET CLOSE BUTTON
 ========================================================= */
@@ -1238,14 +1312,12 @@ body {
 
   font-size: 18px;
 
-  transition:
-    color 0.15s ease;
+  transition: color 0.15s ease;
 }
 
 .leaflet-container a.leaflet-popup-close-button:hover {
   color: #111827;
 }
-
 
 /* =========================================================
    LEAFLET ZOOM CONTROL
@@ -1253,66 +1325,63 @@ body {
 
 .room-app .leaflet-control-zoom {
   margin-left: 16px;
-
   margin-top: 84px;
 
   border: none !important;
 
-  box-shadow:
-    0 6px 20px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+
+  border-radius: 12px;
+
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
 }
 
 .room-app .leaflet-control-zoom a {
-  width: 34px;
+  width: 36px;
+  height: 36px;
 
-  height: 34px;
-
-  line-height: 34px;
+  line-height: 36px;
 
   border: none !important;
 
-  background:
-    rgba(10, 15, 24, 0.9);
+  background: rgba(12, 16, 27, 0.88);
 
-  color: white;
+  color: #cbd5e1;
 
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
 }
 
 .room-app .leaflet-control-zoom a:hover {
-  background:
-    rgba(25, 34, 48, 0.95);
+  background: rgba(99, 102, 241, 0.18);
 
   color: white;
 }
 
 .room-app .leaflet-control-zoom a:first-child {
-  border-radius:
-    9px 9px 0 0;
+  border-radius: 9px 9px 0 0;
 }
 
 .room-app .leaflet-control-zoom a:last-child {
-  border-radius:
-    0 0 9px 9px;
+  border-radius: 0 0 9px 9px;
 }
-
 
 /* =========================================================
    LEAFLET ATTRIBUTION
 ========================================================= */
 
 .room-app .leaflet-control-attribution {
-  background:
-    rgba(10, 15, 24, 0.7);
+  background: rgba(10, 15, 24, 0.7);
 
   color: #94a3b8;
 
-  border-radius:
-    5px 0 0 0;
+  border-radius: 5px 0 0 0;
 
-  padding:
-    3px 6px;
+  padding: 3px 6px;
 
   font-size: 9px;
 }
@@ -1320,7 +1389,6 @@ body {
 .room-app .leaflet-control-attribution a {
   color: #c7d2fe;
 }
-
 
 /* =========================================================
    MEMBER MARKER POPUP
@@ -1330,13 +1398,11 @@ body {
   pointer-events: auto;
 }
 
-
 /* =========================================================
    TABLET
 ========================================================= */
 
 @media (max-width: 900px) {
-
   .top-bar {
     top: 12px;
 
@@ -1378,13 +1444,11 @@ body {
   }
 }
 
-
 /* =========================================================
    SMALL TABLET / LARGE PHONE
 ========================================================= */
 
 @media (max-width: 700px) {
-
   .top-bar {
     height: auto;
 
@@ -1406,7 +1470,6 @@ body {
   .room-detail {
     font-size: 11px;
   }
-
 
   /* MEMBERS */
 
@@ -1432,7 +1495,6 @@ body {
     font-size: 10px;
   }
 
-
   /* BOTTOM */
 
   .bottom-controls {
@@ -1440,8 +1502,7 @@ body {
 
     width: auto;
 
-    max-width:
-      calc(100vw - 20px);
+    max-width: calc(100vw - 20px);
 
     gap: 6px;
 
@@ -1458,14 +1519,12 @@ body {
     font-size: 12px;
   }
 
-
   /* DESTINATION ACTIONS */
 
   .destination-actions {
     bottom: 72px;
 
-    max-width:
-      calc(100vw - 20px);
+    max-width: calc(100vw - 20px);
 
     padding: 6px;
   }
@@ -1478,7 +1537,6 @@ body {
 
     font-size: 12px;
   }
-
 
   /* TERRAIN */
 
@@ -1494,7 +1552,6 @@ body {
     font-size: 12px;
   }
 
-
   /* NEARBY */
 
   .victo-nearby-notification {
@@ -1502,13 +1559,10 @@ body {
 
     min-width: 0;
 
-    width:
-      calc(100vw - 24px);
+    width: calc(100vw - 24px);
 
-    max-width:
-      calc(100vw - 24px);
+    max-width: calc(100vw - 24px);
   }
-
 
   /* ZOOM */
 
@@ -1519,13 +1573,11 @@ body {
   }
 }
 
-
 /* =========================================================
    MOBILE
 ========================================================= */
 
 @media (max-width: 520px) {
-
   .top-bar {
     top: 8px;
 
@@ -1552,7 +1604,6 @@ body {
     font-size: 10px;
   }
 
-
   /* MEMBERS PANEL */
 
   .members-panel {
@@ -1562,11 +1613,9 @@ body {
 
     width: 200px;
 
-    max-width:
-      calc(100vw - 16px);
+    max-width: calc(100vw - 16px);
 
-    max-height:
-      calc(100vh - 145px);
+    max-height: calc(100vh - 145px);
 
     padding: 11px;
 
@@ -1593,7 +1642,6 @@ body {
     font-size: 9px;
   }
 
-
   /* SELECTED MEMBER */
 
   .selected-member-route-data {
@@ -1612,7 +1660,6 @@ body {
     font-size: 12px;
   }
 
-
   /* BOTTOM */
 
   .bottom-controls {
@@ -1620,11 +1667,9 @@ body {
 
     bottom: 10px;
 
-    width:
-      calc(100vw - 16px);
+    width: calc(100vw - 16px);
 
-    max-width:
-      calc(100vw - 16px);
+    max-width: calc(100vw - 16px);
 
     justify-content: center;
 
@@ -1651,7 +1696,6 @@ body {
     text-overflow: ellipsis;
   }
 
-
   /* DESTINATION ACTIONS */
 
   .destination-actions {
@@ -1659,11 +1703,9 @@ body {
 
     bottom: 62px;
 
-    width:
-      calc(100vw - 16px);
+    width: calc(100vw - 16px);
 
-    max-width:
-      calc(100vw - 16px);
+    max-width: calc(100vw - 16px);
 
     justify-content: center;
 
@@ -1691,7 +1733,6 @@ body {
     text-overflow: ellipsis;
   }
 
-
   /* TERRAIN */
 
   .terrain-button {
@@ -1708,17 +1749,14 @@ body {
     border-radius: 9px;
   }
 
-
   /* NEARBY NOTIFICATION */
 
   .victo-nearby-notification {
     top: 62px;
 
-    width:
-      calc(100vw - 24px);
+    width: calc(100vw - 24px);
 
-    max-width:
-      calc(100vw - 24px);
+    max-width: calc(100vw - 24px);
 
     padding: 10px 11px;
 
@@ -1750,7 +1788,6 @@ body {
 
     font-size: 17px;
   }
-
 
   /* DESTINATION */
 
@@ -1794,7 +1831,6 @@ body {
     height: 9px;
   }
 
-
   /* LEAFLET */
 
   .room-app .leaflet-control-zoom {
@@ -1816,18 +1852,15 @@ body {
   .room-app .leaflet-control-attribution {
     font-size: 8px;
 
-    padding:
-      2px 4px;
+    padding: 2px 4px;
   }
 }
-
 
 /* =========================================================
    VERY SMALL PHONES
 ========================================================= */
 
 @media (max-width: 380px) {
-
   .room-detail {
     display: none;
   }
@@ -1866,13 +1899,11 @@ body {
   }
 }
 
-
 /* =========================================================
    LANDSCAPE MOBILE
 ========================================================= */
 
 @media (max-height: 500px) and (orientation: landscape) {
-
   .top-bar {
     top: 6px;
 
@@ -1922,13 +1953,11 @@ body {
   }
 }
 
-
 /* =========================================================
    HOVER DEVICE SUPPORT
 ========================================================= */
 
 @media (hover: none) {
-
   /*
     Touch devices don't have a true hover state.
 
@@ -1961,7 +1990,6 @@ body {
   }
 }
 
-
 /* =========================================================
    FOCUS ACCESSIBILITY
 ========================================================= */
@@ -1972,31 +2000,1024 @@ body {
 .terrain-button:focus-visible,
 .victo-destination-remove:focus-visible,
 .victo-nearby-notification-close:focus-visible {
-  outline:
-    2px solid #818cf8;
+  outline: 2px solid #818cf8;
 
   outline-offset: 2px;
 }
-
 
 /* =========================================================
    REDUCED MOTION
 ========================================================= */
 
 @media (prefers-reduced-motion: reduce) {
-
   *,
   *::before,
   *::after {
     scroll-behavior: auto !important;
 
-    animation-duration:
-      0.01ms !important;
+    animation-duration: 0.01ms !important;
 
-    animation-iteration-count:
-      1 !important;
+    animation-iteration-count: 1 !important;
 
-    transition-duration:
-      0.01ms !important;
+    transition-duration: 0.01ms !important;
   }
+}
+
+.control-button.mesh-active {
+  background: rgba(34, 211, 238, 0.12);
+
+  color: #67e8f9;
+
+  box-shadow:
+    inset 0 0 0 1px rgba(103, 232, 249, 0.35),
+    0 0 12px rgba(34, 211, 238, 0.08);
+}
+
+.control-button.mesh-active:hover {
+  background: rgba(34, 211, 238, 0.18);
+}
+
+.control-button.mesh-active {
+  background: linear-gradient(
+    135deg,
+    rgba(34, 211, 238, 0.16),
+    rgba(99, 102, 241, 0.16)
+  );
+
+  color: #67e8f9;
+
+  border-color: rgba(34, 211, 238, 0.32);
+
+  box-shadow:
+    0 0 20px rgba(34, 211, 238, 0.1),
+    inset 0 0 18px rgba(34, 211, 238, 0.04);
+}
+
+.terrain-button {
+  position: absolute;
+
+  z-index: 1000;
+
+  left: 16px;
+  bottom: 18px;
+
+  min-height: 42px;
+
+  padding: 10px 14px;
+
+  border: 1px solid rgba(255, 255, 255, 0.09);
+
+  border-radius: 12px;
+
+  background: rgba(12, 15, 25, 0.86);
+
+  color: #cbd5e1;
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  font-size: 12px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.3);
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.terrain-button:hover {
+  background: rgba(30, 35, 52, 0.92);
+
+  border-color: rgba(255, 255, 255, 0.16);
+
+  transform: translateY(-1px);
+}
+
+/* ======================================================
+   PREMIUM MEMBER ROUTES
+====================================================== */
+
+.victo-route {
+  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.18));
+}
+
+.victo-route-selected {
+  filter: drop-shadow(0 0 7px rgba(255, 255, 255, 0.45));
+}
+
+/* ======================================================
+   PREMIUM LIVE LOCATION MARKER
+====================================================== */
+
+.victo-member-marker {
+  background: transparent !important;
+  border: none !important;
+}
+
+.victo-live-marker {
+  position: relative;
+
+  width: 58px;
+  height: 58px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  pointer-events: auto;
+}
+
+/* ------------------------------------------------------
+   AVATAR
+------------------------------------------------------ */
+
+.victo-live-avatar {
+  position: relative;
+  z-index: 5;
+
+  width: 44px;
+  height: 44px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+
+  border-radius: 50%;
+
+  background: linear-gradient(145deg, #202938, #111827);
+
+  border: 2px solid var(--marker-color);
+
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.45),
+    0 0 12px color-mix(in srgb, var(--marker-color) 35%, transparent);
+
+  font-size: 22px;
+}
+
+.victo-live-avatar img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+}
+
+/* ------------------------------------------------------
+   ONLINE DOT
+------------------------------------------------------ */
+
+.victo-live-status {
+  position: absolute;
+
+  z-index: 10;
+
+  right: 5px;
+  bottom: 5px;
+
+  width: 11px;
+  height: 11px;
+
+  border-radius: 50%;
+
+  border: 2px solid #111827;
+
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.55);
+}
+
+/* ------------------------------------------------------
+   MY LOCATION
+------------------------------------------------------ */
+
+.victo-live-marker-me .victo-live-avatar {
+  border-width: 2px;
+
+  box-shadow:
+    0 4px 18px rgba(0, 0, 0, 0.5),
+    0 0 18px rgba(34, 211, 238, 0.45);
+}
+
+/* ------------------------------------------------------
+   PULSE
+------------------------------------------------------ */
+
+.victo-live-pulse {
+  position: absolute;
+
+  z-index: 1;
+
+  width: 46px;
+  height: 46px;
+
+  border-radius: 50%;
+
+  border: 1px solid var(--marker-color);
+
+  opacity: 0;
+
+  animation: victoMarkerPulse 2.4s ease-out infinite;
+}
+
+.pulse-delay {
+  animation-delay: 1.2s;
+}
+
+@keyframes victoMarkerPulse {
+  0% {
+    transform: scale(0.75);
+    opacity: 0.55;
+  }
+
+  70% {
+    transform: scale(1.55);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1.55);
+    opacity: 0;
+  }
+}
+
+/* ======================================================
+   PREMIUM DESTINATION
+====================================================== */
+
+.victo-destination-icon-wrapper {
+  background: transparent !important;
+  border: none !important;
+}
+
+.victo-destination-marker {
+  position: relative;
+
+  width: 170px;
+  height: 82px;
+
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------
+   PIN
+------------------------------------------------------ */
+
+.victo-destination-pin {
+  position: absolute;
+
+  left: 0;
+  top: 0;
+
+  width: 36px;
+  height: 36px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transform: rotate(-45deg);
+
+  border-radius: 50% 50% 50% 0;
+
+  background: linear-gradient(135deg, #fb7185, #ef4444);
+
+  border: 2px solid rgba(255, 255, 255, 0.85);
+
+  box-shadow:
+    0 7px 18px rgba(239, 68, 68, 0.38),
+    0 0 20px rgba(251, 113, 133, 0.25);
+}
+
+/* ------------------------------------------------------
+   INNER DOT
+------------------------------------------------------ */
+
+.victo-destination-pin-inner {
+  width: 11px;
+  height: 11px;
+
+  border-radius: 50%;
+
+  background: white;
+
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+
+  transform: rotate(45deg);
+}
+
+/* ------------------------------------------------------
+   DESTINATION PULSE
+------------------------------------------------------ */
+
+.victo-destination-marker::before {
+  content: "";
+
+  position: absolute;
+
+  left: 18px;
+  top: 18px;
+
+  width: 36px;
+  height: 36px;
+
+  border-radius: 50%;
+
+  border: 1px solid rgba(251, 113, 133, 0.7);
+
+  transform: translate(-50%, -50%);
+
+  animation: victoDestinationPulse 2s ease-out infinite;
+}
+
+@keyframes victoDestinationPulse {
+  0% {
+    transform: translate(-50%, -50%) scale(0.7);
+    opacity: 0.65;
+  }
+
+  70% {
+    transform: translate(-50%, -50%) scale(1.8);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translate(-50%, -50%) scale(1.8);
+    opacity: 0;
+  }
+}
+
+.victo-destination-label {
+  position: absolute;
+
+  left: 34px;
+  top: 3px;
+
+  padding: 6px 10px;
+
+  border-radius: 9px;
+
+  background: rgba(12, 15, 25, 0.9);
+
+  border: 1px solid rgba(251, 113, 133, 0.2);
+
+  color: #fda4af;
+
+  font-size: 10px;
+
+  font-weight: 800;
+
+  letter-spacing: 0.3px;
+
+  white-space: nowrap;
+
+  box-shadow: 0 7px 20px rgba(0, 0, 0, 0.3);
+
+  backdrop-filter: blur(12px);
+}
+
+/* =====================================================
+   PREMIUM MEMBERS PANEL
+===================================================== */
+
+.premium-members-panel {
+  position: absolute;
+  top: 82px;
+  right: 18px;
+  left: auto;
+
+  width: 260px;
+  max-width: calc(100vw - 36px);
+
+  padding: 12px;
+
+  background: rgba(15, 20, 30, 0.88);
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  border: 1px solid rgba(255, 255, 255, 0.09);
+
+  border-radius: 18px;
+
+  box-shadow:
+    0 14px 40px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+
+  color: white;
+
+  z-index: 1000;
+
+  overflow: hidden;
+}
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+.members-panel-header {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 2px 2px 10px;
+}
+
+.members-panel-title-group {
+  display: flex;
+
+  align-items: center;
+
+  gap: 9px;
+}
+
+.members-panel-icon {
+  width: 32px;
+  height: 32px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 10px;
+
+  background: rgba(99, 102, 241, 0.14);
+
+  border: 1px solid rgba(99, 102, 241, 0.2);
+
+  font-size: 15px;
+}
+
+.members-panel-title {
+  font-size: 13px;
+
+  font-weight: 750;
+
+  letter-spacing: -0.1px;
+}
+
+.members-panel-count {
+  margin-top: 1px;
+
+  font-size: 10px;
+
+  color: #7f8ba3;
+}
+
+.members-panel-collapse {
+  width: 29px;
+  height: 29px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 0;
+  border-radius: 9px;
+
+  background: rgba(255, 255, 255, 0.05);
+
+  color: #aab4c6;
+
+  font-size: 16px;
+
+  cursor: pointer;
+
+  transition:
+    background 0.18s ease,
+    color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.members-panel-collapse:hover {
+  background: rgba(255, 255, 255, 0.1);
+
+  color: white;
+
+  transform: translateY(-1px);
+}
+
+/* =====================================================
+   MEMBER LIST
+===================================================== */
+
+.members-list {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 4px;
+
+  max-height: 300px;
+
+  overflow-y: auto;
+
+  padding-right: 2px;
+}
+
+.members-list::-webkit-scrollbar {
+  width: 3px;
+}
+
+.members-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.members-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+
+  border-radius: 20px;
+}
+
+/* =====================================================
+   MEMBER ROW
+===================================================== */
+
+.premium-member-row {
+  position: relative;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  min-height: 52px;
+
+  padding: 5px 7px;
+
+  border-radius: 13px;
+
+  cursor: pointer;
+
+  border: 1px solid transparent;
+
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.premium-member-row:hover {
+  background: rgba(255, 255, 255, 0.045);
+
+  border-color: rgba(255, 255, 255, 0.06);
+
+  transform: translateX(2px);
+}
+
+.premium-member-row.selected {
+  background: linear-gradient(
+    90deg,
+    rgba(99, 102, 241, 0.16),
+    rgba(99, 102, 241, 0.06)
+  );
+
+  border-color: rgba(99, 102, 241, 0.24);
+}
+
+/* =====================================================
+   LARGE PROFILE IMAGE
+===================================================== */
+
+.premium-member-avatar {
+  position: relative;
+
+  width: 46px;
+  height: 46px;
+
+  flex-shrink: 0;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #202938;
+
+  border: 2px solid rgba(255, 255, 255, 0.13);
+
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.28);
+
+  overflow: visible;
+}
+
+.premium-member-avatar img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  border-radius: 50%;
+}
+
+.premium-member-avatar span:not(.member-online-dot) {
+  font-size: 22px;
+}
+
+/* =====================================================
+   ONLINE DOT
+===================================================== */
+
+.member-online-dot {
+  position: absolute;
+
+  right: -1px;
+  bottom: -1px;
+
+  width: 11px;
+  height: 11px;
+
+  border-radius: 50%;
+
+  border: 2px solid #111722;
+
+  box-sizing: border-box;
+}
+
+.member-online-dot.online {
+  background: #22c55e;
+
+  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.12);
+}
+
+.member-online-dot.offline {
+  background: #64748b;
+}
+
+/* =====================================================
+   MEMBER INFORMATION
+===================================================== */
+
+.premium-member-info {
+  flex: 1;
+
+  min-width: 0;
+}
+
+.premium-member-name {
+  display: flex;
+
+  align-items: center;
+
+  gap: 6px;
+
+  font-size: 13px;
+
+  font-weight: 700;
+
+  white-space: nowrap;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+}
+
+.premium-member-status {
+  margin-top: 2px;
+
+  font-size: 10px;
+
+  color: #68758a;
+}
+
+.online-text {
+  color: #4ade80 !important;
+}
+
+/* =====================================================
+   YOU BADGE
+===================================================== */
+
+.premium-you-badge {
+  padding: 2px 5px;
+
+  border-radius: 5px;
+
+  font-size: 8px;
+
+  font-weight: 800;
+
+  letter-spacing: 0.5px;
+
+  color: #a5b4fc;
+
+  background: rgba(99, 102, 241, 0.14);
+
+  border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+/* =====================================================
+   DESTINATION INDICATOR
+===================================================== */
+
+.member-destination-indicator {
+  width: 26px;
+  height: 26px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 8px;
+
+  background: rgba(99, 102, 241, 0.11);
+
+  border: 1px solid rgba(99, 102, 241, 0.15);
+
+  color: #a5b4fc;
+
+  font-size: 15px;
+
+  flex-shrink: 0;
+}
+
+/* =====================================================
+   SELECTED ARROW
+===================================================== */
+
+.member-selected-arrow {
+  color: #a5b4fc;
+
+  font-size: 18px;
+
+  line-height: 1;
+
+  margin-left: -2px;
+}
+
+/* =====================================================
+   SELECTED MEMBER CARD
+===================================================== */
+
+.selected-member-card {
+  margin-top: 8px;
+
+  padding: 10px;
+
+  border-radius: 13px;
+
+  background: rgba(255, 255, 255, 0.035);
+
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.selected-member-card-header {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 9px;
+}
+
+.selected-member-card-header span {
+  font-size: 8px;
+
+  font-weight: 800;
+
+  letter-spacing: 1px;
+
+  color: #68758a;
+}
+
+.selected-member-card-header button {
+  width: 20px;
+  height: 20px;
+
+  border: 0;
+
+  border-radius: 6px;
+
+  background: rgba(255, 255, 255, 0.05);
+
+  color: #8d98ad;
+
+  cursor: pointer;
+}
+
+.selected-member-main {
+  display: flex;
+
+  align-items: center;
+
+  gap: 9px;
+}
+
+.selected-member-name {
+  font-size: 13px;
+
+  font-weight: 700;
+}
+
+.selected-member-status {
+  margin-top: 2px;
+
+  font-size: 10px;
+
+  color: #68758a;
+}
+
+.selected-member-loading,
+.selected-member-empty {
+  margin-top: 9px;
+
+  padding: 8px;
+
+  border-radius: 8px;
+
+  background: rgba(255, 255, 255, 0.035);
+
+  color: #8d98ad;
+
+  font-size: 10px;
+}
+
+.selected-route-stats {
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: 6px;
+
+  margin-top: 9px;
+}
+
+.selected-route-stat {
+  padding: 7px;
+
+  border-radius: 8px;
+
+  background: rgba(255, 255, 255, 0.035);
+
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.selected-route-stat span {
+  display: block;
+
+  font-size: 8px;
+
+  color: #68758a;
+
+  margin-bottom: 3px;
+}
+
+.selected-route-stat strong {
+  font-size: 12px;
+}
+
+/* =====================================================
+   COLLAPSED BUTTON
+===================================================== */
+
+.members-panel-collapsed {
+  position: absolute;
+
+  top: 82px;
+  right: 18px;
+  left: auto;
+
+  z-index: 1000;
+
+  width: 48px;
+  height: 48px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 1px;
+
+  border-radius: 15px;
+
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
+  background: rgba(15, 20, 30, 0.88);
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  color: white;
+
+  cursor: pointer;
+
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+
+  transition:
+    transform 0.18s ease,
+    background 0.18s ease;
+}
+
+.members-panel-collapsed:hover {
+  transform: translateY(-2px);
+
+  background: rgba(25, 31, 44, 0.95);
+}
+
+.collapsed-members-icon {
+  font-size: 17px;
+}
+
+.collapsed-members-count {
+  position: absolute;
+
+  top: -5px;
+  right: -5px;
+
+  min-width: 18px;
+  height: 18px;
+
+  padding: 0 4px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 20px;
+
+  background: #6366f1;
+
+  border: 2px solid #111722;
+
+  color: white;
+
+  font-size: 9px;
+
+  font-weight: 800;
+}
+
+
+
+
+/* =====================================================
+   LEAVE ROOM BUTTON
+===================================================== */
+
+.leave-room-button {
+  position: absolute;
+
+  top: 18px;
+  right: 18px;
+  left: auto;
+
+  z-index: 1100;
+
+  height: 38px;
+
+  padding: 0 13px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 5px;
+
+  border-radius: 11px;
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  background: rgba(15, 20, 30, 0.82);
+
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+
+  color: #cbd5e1;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.22);
+
+  transition:
+    background 0.18s ease,
+    color 0.18s ease,
+    transform 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.leave-room-button:hover {
+  background: rgba(239, 68, 68, 0.12);
+
+  border-color: rgba(239, 68, 68, 0.25);
+
+  color: #fca5a5;
+
+  transform: translateY(-1px);
+}
+
+.leave-room-button:active {
+  transform: translateY(0);
 }
