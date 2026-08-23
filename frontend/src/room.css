@@ -3021,3 +3021,22 @@ body {
 .leave-room-button:active {
   transform: translateY(0);
 }
+
+
+
+/* ======================================================
+   OFFLINE MEMBER MARKER
+====================================================== */
+
+.victo-live-marker-offline {
+  filter: grayscale(100%);
+  opacity: 0.65;
+}
+
+.victo-live-marker-offline .victo-live-avatar {
+  filter: grayscale(100%);
+}
+
+.victo-live-marker-offline .victo-live-status {
+  background: #6b7280 !important;
+}

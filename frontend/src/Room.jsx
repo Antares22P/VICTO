@@ -543,7 +543,7 @@ function Room() {
     }
   };
 
-  const leaveRoom = () => {
+  const leaveRoom = async () => {
     const confirmed = window.confirm(
       "Are you sure you want to leave this room?",
     );
@@ -552,14 +552,44 @@ function Room() {
       return;
     }
 
-    // Clear this user's room session
-    localStorage.removeItem("roomId");
-    localStorage.removeItem("roomCode");
-    localStorage.removeItem("memberId");
-    localStorage.removeItem("name");
+    try {
+      // --------------------------------------------------
+      // FIRST: Mark this member OFFLINE
+      // --------------------------------------------------
 
-    // Return to home page
-    window.location.href = "/";
+      if (roomId && memberId) {
+        const response = await fetch(
+          `${API_URL}/api/member/status` +
+            `?roomId=${encodeURIComponent(roomId)}` +
+            `&memberId=${encodeURIComponent(memberId)}` +
+            `&online=false`,
+          {
+            method: "POST",
+          },
+        );
+
+        if (!response.ok) {
+          console.error("Failed to mark member offline:", response.status);
+        }
+      }
+    } catch (error) {
+      console.error("Leave room status update failed:", error);
+    } finally {
+      // --------------------------------------------------
+      // CLEAR THIS USER'S ROOM SESSION
+      // --------------------------------------------------
+
+      localStorage.removeItem("roomId");
+      localStorage.removeItem("roomCode");
+      localStorage.removeItem("memberId");
+      localStorage.removeItem("name");
+
+      // --------------------------------------------------
+      // RETURN TO HOME PAGE
+      // --------------------------------------------------
+
+      window.location.href = "/";
+    }
   };
 
   // ====================================================
@@ -1541,17 +1571,13 @@ function Room() {
         ---------------------------------------------- */}
 
         <TileLayer
-  attribution={
-    satelliteMode
-      ? "&copy; Esri"
-      : "&copy; Carto"
-  }
-  url={
-    satelliteMode
-      ? "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-      : "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-  }
-/>
+          attribution={satelliteMode ? "&copy; Esri" : "&copy; Carto"}
+          url={
+            satelliteMode
+              ? "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+              : "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+          }
+        />
 
         {/* ----------------------------------------------
             MAP CLICK
@@ -1694,41 +1720,50 @@ function Room() {
 
           const isMe = id === memberId;
 
-          // const avatarHtml = member.profileImage
+          const isOffline = member.online === false;
+
           const markerColor = isMe ? "#22d3ee" : getRouteColor(id, members);
 
+          const markerClass = [
+            "victo-live-marker",
+            isMe ? "victo-live-marker-me" : "",
+            isOffline ? "victo-live-marker-offline" : "",
+          ]
+            .filter(Boolean)
+            .join(" ");
+
           const avatarHtml = member.profileImage
-            ? `
-      <div
-        class="victo-live-marker ${isMe ? "victo-live-marker-me" : ""}"
-        style="--marker-color:${markerColor};"
-      >
+  ? `
+    <div
+      class="${markerClass}"
+      style="--marker-color:${markerColor};"
+    >
 
-        ${
-          isMe
-            ? `
-              <div class="victo-live-pulse"></div>
-              <div class="victo-live-pulse pulse-delay"></div>
-            `
-            : ""
-        }
+      ${
+        isMe && !isOffline
+          ? `
+            <div class="victo-live-pulse"></div>
+            <div class="victo-live-pulse pulse-delay"></div>
+          `
+          : ""
+      }
 
-        <div class="victo-live-avatar">
-          <img
-            src="${member.profileImage}"
-            alt=""
-          />
-        </div>
-
-        <div
-          class="victo-live-status"
-          style="
-            background:${member.online ? "#22c55e" : "#6b7280"};
-          "
-        ></div>
-
+      <div class="victo-live-avatar">
+        <img
+          src="${member.profileImage}"
+          alt=""
+        />
       </div>
-    `
+
+      <div
+        class="victo-live-status"
+        style="
+          background:${member.online ? "#22c55e" : "#6b7280"};
+        "
+      ></div>
+
+    </div>
+  `
             : `
       <div
         class="victo-live-marker ${isMe ? "victo-live-marker-me" : ""}"
