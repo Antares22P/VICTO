@@ -20,17 +20,11 @@ function BottomSection({
 
       {selectedDestination && (
         <div className="destination-actions">
-          <button
-            className="destination-save"
-            onClick={saveDestination}
-          >
+          <button className="destination-save" onClick={saveDestination}>
             📍 Set Destination
           </button>
 
-          <button
-            className="destination-cancel"
-            onClick={cancelDestination}
-          >
+          <button className="destination-cancel" onClick={cancelDestination}>
             ✕ Cancel
           </button>
         </div>
@@ -41,15 +35,11 @@ function BottomSection({
       ================================================== */}
 
       <div className="bottom-controls">
-
         {/* ----------------------------------------------
             MY LOCATION
         ---------------------------------------------- */}
 
-        <button
-          className="control-button"
-          onClick={goToMyLocation}
-        >
+        <button className="control-button" onClick={goToMyLocation}>
           ◎ My Location
         </button>
 
@@ -57,10 +47,7 @@ function BottomSection({
             FIT ALL MEMBERS
         ---------------------------------------------- */}
 
-        <button
-          className="control-button"
-          onClick={fitAllMembers}
-        >
+        <button className="control-button" onClick={fitAllMembers}>
           ⛶ Fit All
         </button>
 
@@ -69,48 +56,32 @@ function BottomSection({
         ---------------------------------------------- */}
 
         <button
-          className={
-            followMe
-              ? "control-button active"
-              : "control-button"
-          }
-          onClick={() =>
-            setFollowMe((previous) => !previous)
-          }
+          className={followMe ? "control-button active" : "control-button"}
+          onClick={() => setFollowMe((previous) => !previous)}
         >
-          {followMe
-            ? "◉ Following"
-            : "◎ Follow"}
+          {followMe ? "◉ Following" : "◎ Follow"}
         </button>
 
         {/* ----------------------------------------------
     MESH
 ---------------------------------------------- */}
 
-<button
-  className={
-    meshEnabled
-      ? "control-button active mesh-active"
-      : "control-button"
-  }
-  onClick={() =>
-    setMeshEnabled((previous) => !previous)
-  }
->
-  {meshEnabled ? "◉ Mesh" : "◎ Mesh"}
-</button>
+        <button
+          className={
+            meshEnabled ? "control-button active mesh-active" : "control-button"
+          }
+          onClick={() => setMeshEnabled((previous) => !previous)}
+        >
+          {meshEnabled ? "◉ Mesh" : "◎ Mesh"}
+        </button>
 
         {/* ----------------------------------------------
             INVITE
         ---------------------------------------------- */}
 
-        <button
-          className="control-button primary"
-          onClick={copyInviteLink}
-        >
+        <button className="control-button primary" onClick={copyInviteLink}>
           + Invite
         </button>
-
       </div>
     </>
   );

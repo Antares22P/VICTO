@@ -7,23 +7,35 @@ public class Member {
     private long joinedAt;
     private boolean online;
     private String roomId;
-
-    public String getRoomId() {
-        return roomId;
-    }
-
-    public void setRoomId(String roomId) {
-        this.roomId = roomId;
-    }
+    private String profileImage;
 
     public Member() {
     }
 
-    public Member(String memberId, String name, long joinedAt, boolean online) {
+    public Member(
+            String memberId,
+            String name,
+            long joinedAt,
+            boolean online
+    ) {
         this.memberId = memberId;
         this.name = name;
         this.joinedAt = joinedAt;
         this.online = online;
+    }
+
+    public Member(
+            String memberId,
+            String name,
+            long joinedAt,
+            boolean online,
+            String profileImage
+    ) {
+        this.memberId = memberId;
+        this.name = name;
+        this.joinedAt = joinedAt;
+        this.online = online;
+        this.profileImage = profileImage;
     }
 
     public String getMemberId() {
@@ -56,5 +68,21 @@ public class Member {
 
     public void setOnline(boolean online) {
         this.online = online;
+    }
+
+    public String getRoomId() {
+        return roomId;
+    }
+
+    public void setRoomId(String roomId) {
+        this.roomId = roomId;
+    }
+
+    public String getProfileImage() {
+        return profileImage;
+    }
+
+    public void setProfileImage(String profileImage) {
+        this.profileImage = profileImage;
     }
 }

@@ -506,6 +506,7 @@ function Room() {
   const [nearbyNotification, setNearbyNotification] = useState(null);
 
   const [membersPanelOpen, setMembersPanelOpen] = useState(true);
+  const [satelliteMode, setSatelliteMode] = useState(false);
 
   // Members currently inside 30m.
   // Prevents repeated sounds on every Firebase update.
@@ -1224,19 +1225,13 @@ function Room() {
 
   return (
     <div className="room-app">
-
-
-        {/* ==================================================
+      {/* ==================================================
     LEAVE ROOM
 ================================================== */}
 
-<button
-  type="button"
-  className="leave-room-button"
-  onClick={leaveRoom}
->
-  ← Leave
-</button>
+      <button type="button" className="leave-room-button" onClick={leaveRoom}>
+        ← Leave
+      </button>
       {/* ==================================================
           NEARBY MEMBER NOTIFICATION
       ================================================== */}
@@ -1521,14 +1516,11 @@ function Room() {
       ================================================== */}
 
       <button
-        className="terrain-button"
-        onClick={() => {
-          alert("Terrain / Satellite mode will be added next.");
-        }}
+        className={`terrain-button ${satelliteMode ? "terrain-active" : ""}`}
+        onClick={() => setSatelliteMode((prev) => !prev)}
       >
-        🗺 Terrain
+        {satelliteMode ? "🛰 Satellite" : "🗺 Terrain"}
       </button>
-
       {/* ==================================================
           MAP
       ================================================== */}
@@ -1549,11 +1541,17 @@ function Room() {
         ---------------------------------------------- */}
 
         <TileLayer
-          attribution="&copy; OpenStreetMap contributors &copy; CARTO"
-          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-          subdomains="abcd"
-          maxZoom={20}
-        />
+  attribution={
+    satelliteMode
+      ? "&copy; Esri"
+      : "&copy; Carto"
+  }
+  url={
+    satelliteMode
+      ? "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+      : "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+  }
+/>
 
         {/* ----------------------------------------------
             MAP CLICK
