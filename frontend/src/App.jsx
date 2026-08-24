@@ -65,7 +65,7 @@ function App() {
       // console.log("Creating room with profile image:", profileImage);
 
       const response = await fetch(
-        `${API_URL || "http://localhost:8080"}/api/rooms`,
+        `${API_URL || "API_URL"}/api/rooms`,
         {
           method: "POST",
           headers: {
@@ -128,7 +128,7 @@ function App() {
     // console.log("Profile image exists:", !!profileImage);
 
     const response = await fetch(
-  `${API_URL || "http://localhost:8080"}/api/rooms/join`,
+  `${API_URL || "API_URL"}/api/rooms/join`,
   {
     method: "POST",
     headers: {

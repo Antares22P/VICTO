@@ -6,7 +6,10 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/member")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = {
+    "http://localhost:5173",
+    "https://victo-stayconnected.vercel.app/"
+})
 public class MemberController {
 
     @PostMapping("/status")

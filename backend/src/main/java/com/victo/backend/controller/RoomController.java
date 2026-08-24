@@ -16,7 +16,10 @@ import java.util.concurrent.ThreadLocalRandom;
 
 @RestController
 @RequestMapping("/api/rooms")
-// @CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = {
+    "http://localhost:5173",
+    "https://victo-stayconnected.vercel.app/"
+})
 public class RoomController {
 
         @PostMapping
