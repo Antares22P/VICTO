@@ -1,15 +1,27 @@
-FROM eclipse-temurin:25-jdk
+
+FROM maven:3.9-eclipse-temurin-25 AS build
 
 WORKDIR /app
 
-COPY .mvn .mvn
-COPY mvnw .
 COPY pom.xml .
 
-RUN chmod +x mvnw
+RUN mvn dependency:go-offline
 
-RUN ./mvnw clean package -DskipTests
+COPY src src
+
+RUN mvn clean package -DskipTests
+
+
+# ==============================
+# RUN STAGE
+# ==============================
+
+FROM eclipse-temurin:25-jre
+
+WORKDIR /app
+
+COPY --from=build /app/target/*.jar app.jar
 
 EXPOSE 8080
 
-CMD ["sh", "-c", "java -jar target/*.jar"]
+CMD ["java", "-jar", "app.jar"]
