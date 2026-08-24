@@ -511,18 +511,19 @@ body {
 }
 
 
-
 .bottom-controls {
   position: absolute;
 
   z-index: 1000;
 
   left: 50%;
-  bottom: 18px;
+
+  bottom: calc(18px + env(safe-area-inset-bottom));
 
   transform: translateX(-50%);
 
   display: flex;
+
   align-items: center;
 
   gap: 4px;
@@ -536,6 +537,7 @@ body {
   );
 
   backdrop-filter: blur(24px);
+
   -webkit-backdrop-filter: blur(24px);
 
   border: 1px solid rgba(255, 255, 255, 0.1);
