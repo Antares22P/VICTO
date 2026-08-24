@@ -18,16 +18,14 @@ public class CorsConfig {
 
                 registry.addMapping("/**")
                         .allowedOrigins(
-    "http://localhost:5173",
-    "https://YOUR_VERCEL_URL.vercel.app"
-)
+                                "http://localhost:5173",
+                                "https://victo-stayconnected.vercel.app")
                         .allowedMethods(
                                 "GET",
                                 "POST",
                                 "PUT",
                                 "DELETE",
-                                "OPTIONS"
-                        )
+                                "OPTIONS")
                         .allowedHeaders("*")
                         .allowCredentials(false);
             }
