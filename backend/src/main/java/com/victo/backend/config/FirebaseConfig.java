@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import jakarta.annotation.PostConstruct;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 @Configuration
 public class FirebaseConfig {
@@ -15,8 +16,21 @@ public class FirebaseConfig {
     @PostConstruct
     public void initializeFirebase() throws IOException {
 
-        FileInputStream serviceAccount =
-                new FileInputStream("firebase-service-account.json");
+        String credentialsPath = System.getenv(
+                "FIREBASE_SERVICE_ACCOUNT_PATH"
+        );
+
+        InputStream serviceAccount;
+
+        if (credentialsPath != null && !credentialsPath.isBlank()) {
+            // Render
+            serviceAccount = new FileInputStream(credentialsPath);
+        } else {
+            // Local development
+            serviceAccount = new FileInputStream(
+                    "firebase-service-account.json"
+            );
+        }
 
         FirebaseOptions options = FirebaseOptions.builder()
                 .setCredentials(
@@ -30,5 +44,7 @@ public class FirebaseConfig {
         if (FirebaseApp.getApps().isEmpty()) {
             FirebaseApp.initializeApp(options);
         }
+
+        serviceAccount.close();
     }
 }
