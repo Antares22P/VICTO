@@ -1751,9 +1751,44 @@ body {
   }
 
   .bottom-controls {
-    bottom: 8px;
-  }
+  position: absolute;
 
+  z-index: 1000;
+
+  left: 50%;
+
+  bottom: calc(18px + env(safe-area-inset-bottom));
+
+  transform: translateX(-50%);
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 4px;
+
+  padding: 6px;
+
+  background: linear-gradient(
+    135deg,
+    rgba(14, 17, 29, 0.96),
+    rgba(18, 15, 31, 0.94)
+  );
+
+  backdrop-filter: blur(24px);
+
+  -webkit-backdrop-filter: blur(24px);
+
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
+  border-radius: 18px;
+
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+
+  max-width: calc(100vw - 24px);
+}
   .destination-actions {
     bottom: 58px;
   }
