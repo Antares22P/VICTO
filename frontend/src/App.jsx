@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Room from "./Room";
 import "./App.css";
 import ProfileImagePicker from "./components/ProfileImagePicker";
+import { Analytics } from "@vercel/analytics/react";
 
 function App() {
   const API_URL = import.meta.env.VITE_API_URL;
@@ -12,10 +13,22 @@ function App() {
   const [roomName, setRoomName] = useState("");
   const [roomCode, setRoomCode] = useState("");
   const [profileImage, setProfileImage] = useState(null);
+  const [toast, setToast] = useState("");
 
   const [inRoom, setInRoom] = useState(
     !!localStorage.getItem("roomId")
   );
+
+
+  const showToast = (message) => {
+  setToast(message);
+
+  setTimeout(() => {
+    setToast("");
+  }, 1500);
+};
+
+<Analytics />
 
   // LOAD SAVED PROFILE IMAGE
 
@@ -53,63 +66,60 @@ function App() {
 
   // CREATE ROOM
 
-  const createRoom = async () => {
-    if (!name.trim() || !roomName.trim()) {
-      alert("Enter your name and room name");
-      return;
-    }
+  // CREATE ROOM
 
-    try {
-      const creatorId = crypto.randomUUID();
+const createRoom = async () => {
+  if (!name.trim() || !roomName.trim()) {
+    showToast("Please enter your name and room name");
+    return;
+  }
 
-      // console.log("Creating room with profile image:", profileImage);
+  try {
+    const creatorId = crypto.randomUUID();
 
-      const response = await fetch(
-        `${API_URL || "API_URL"}/api/rooms`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            roomName: roomName.trim(),
-            creatorId: creatorId,
-            creatorName: name.trim(),
-            profileImage: profileImage || "",
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        const errorText = await response.text();
-
-        console.error("Create room error:", errorText);
-
-        throw new Error("Failed to create room");
+    const response = await fetch(
+      `${API_URL || "API_URL"}/api/rooms`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          roomName: roomName.trim(),
+          creatorId: creatorId,
+          creatorName: name.trim(),
+          profileImage: profileImage || "",
+        }),
       }
+    );
 
-      const room = await response.json();
+    if (!response.ok) {
+      const errorText = await response.text();
 
-      // console.log("Created room:", room);
+      console.error("Create room error:", errorText);
 
-      // Save creator information
-      localStorage.setItem("roomId", room.roomId);
-      localStorage.setItem("roomCode", room.roomCode);
-      localStorage.setItem("memberId", creatorId);
-      localStorage.setItem("name", name.trim());
-      localStorage.setItem("profileImage", profileImage || "");
-
-      setRoomCode(room.roomCode);
-      setInRoom(true);
-
-      alert(`Room created!\n\nRoom Code: ${room.roomCode}`);
-    } catch (error) {
-      console.error("Create room error:", error);
-
-      alert("Could not create room");
+      throw new Error("Failed to create room");
     }
-  };
 
+    const room = await response.json();
+
+    localStorage.setItem("roomId", room.roomId);
+    localStorage.setItem("roomCode", room.roomCode);
+    localStorage.setItem("memberId", creatorId);
+    localStorage.setItem("name", name.trim());
+    localStorage.setItem("profileImage", profileImage || "");
+
+    setRoomCode(room.roomCode);
+    setInRoom(true);
+
+    showToast(`Room created • ${room.roomCode}`);
+
+  } catch (error) {
+    console.error("Create room error:", error);
+
+    showToast("Could not create room");
+  }
+};
   // JOIN ROOM
 
   const joinRoom = async () => {
@@ -539,7 +549,15 @@ function App() {
 
       </footer>
 
+      {toast && (
+  <div className="toast">
+    {toast}
+  </div>
+)}
+
     </div>
+
+    
   );
 }
 
