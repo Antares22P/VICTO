@@ -373,9 +373,9 @@ function App() {
               ← Back
             </button>
 
-            <div className="form-icon">
+            {/* <div className="form-icon">
               +
-            </div>
+            </div> */}
 
             <div className="form-heading">
               Create a room
@@ -448,9 +448,9 @@ function App() {
               ← Back
             </button>
 
-            <div className="form-icon join-form-icon">
+            {/* <div className="form-icon join-form-icon">
               ↗
-            </div>
+            </div> */}
 
             <div className="form-heading">
               Join a room

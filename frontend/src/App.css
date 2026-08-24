@@ -358,11 +358,11 @@
 
 .room-form-card {
   width: 100%;
-  max-width: 420px;
+  max-width: 320px;
 
   position: relative;
 
-  padding: 31px;
+  padding: 15px;
 
   border-radius: 21px;
 
@@ -398,11 +398,11 @@
 }
 
 .form-icon {
-  width: 46px;
-  height: 46px;
+  width: 40px;
+  height: 40px;
 
-  margin-top: 25px;
-  margin-bottom: 15px;
+  margin-top: 15px;
+  margin-bottom: 8px;
 
   display: flex;
   align-items: center;
@@ -414,7 +414,7 @@
 
   color: #8b8ff5;
 
-  font-size: 25px;
+  font-size: 20px;
 }
 
 .join-form-icon {
@@ -431,7 +431,7 @@
 }
 
 .form-subheading {
-  margin-top: 6px;
+  margin-top: 3px;
 
   color: #727d91;
 
