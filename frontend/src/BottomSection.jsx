@@ -14,10 +14,7 @@ function BottomSection({
 }) {
   return (
     <>
-      {/* ==================================================
-          DESTINATION ACTIONS
-      ================================================== */}
-
+    
       {selectedDestination && (
         <div className="destination-actions">
           <button className="destination-save" onClick={saveDestination}>
@@ -30,30 +27,22 @@ function BottomSection({
         </div>
       )}
 
-      {/* ==================================================
-          BOTTOM CONTROLS
-      ================================================== */}
+ 
 
       <div className="bottom-controls">
-        {/* ----------------------------------------------
-            MY LOCATION
-        ---------------------------------------------- */}
+
 
         <button className="control-button" onClick={goToMyLocation}>
           ◎ My Location
         </button>
 
-        {/* ----------------------------------------------
-            FIT ALL MEMBERS
-        ---------------------------------------------- */}
+        
 
         <button className="control-button" onClick={fitAllMembers}>
           ⛶ Fit All
         </button>
 
-        {/* ----------------------------------------------
-            FOLLOW ME
-        ---------------------------------------------- */}
+        
 
         <button
           className={followMe ? "control-button active" : "control-button"}
@@ -62,9 +51,7 @@ function BottomSection({
           {followMe ? "◉ Following" : "◎ Follow"}
         </button>
 
-        {/* ----------------------------------------------
-    MESH
----------------------------------------------- */}
+    
 
         <button
           className={
@@ -75,9 +62,7 @@ function BottomSection({
           {meshEnabled ? "◉ Mesh" : "◎ Mesh"}
         </button>
 
-        {/* ----------------------------------------------
-            INVITE
-        ---------------------------------------------- */}
+    
 
         <button className="control-button primary" onClick={copyInviteLink}>
           + Invite

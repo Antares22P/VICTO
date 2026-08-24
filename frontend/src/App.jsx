@@ -17,9 +17,7 @@ function App() {
     !!localStorage.getItem("roomId")
   );
 
-  // ==========================================
   // LOAD SAVED PROFILE IMAGE
-  // ==========================================
 
   useEffect(() => {
     const savedProfileImage = localStorage.getItem("profileImage");
@@ -29,9 +27,7 @@ function App() {
     }
   }, []);
 
-  // ==========================================
   // CHECK INVITE LINK
-  // ==========================================
 
   useEffect(() => {
     const path = window.location.pathname;
@@ -46,9 +42,7 @@ function App() {
     }
   }, []);
 
-  // ==========================================
   // PROFILE IMAGE CHANGE
-  // ==========================================
 
   const handleProfileImageChange = (image) => {
     setProfileImage(image);
@@ -57,9 +51,7 @@ function App() {
     localStorage.setItem("profileImage", image || "");
   };
 
-  // ==========================================
   // CREATE ROOM
-  // ==========================================
 
   const createRoom = async () => {
     if (!name.trim() || !roomName.trim()) {
@@ -70,7 +62,7 @@ function App() {
     try {
       const creatorId = crypto.randomUUID();
 
-      console.log("Creating room with profile image:", profileImage);
+      // console.log("Creating room with profile image:", profileImage);
 
       const response = await fetch(
         `${API_URL || "http://localhost:8080"}/api/rooms`,
@@ -98,7 +90,7 @@ function App() {
 
       const room = await response.json();
 
-      console.log("Created room:", room);
+      // console.log("Created room:", room);
 
       // Save creator information
       localStorage.setItem("roomId", room.roomId);
@@ -118,9 +110,7 @@ function App() {
     }
   };
 
-  // ==========================================
   // JOIN ROOM
-  // ==========================================
 
   const joinRoom = async () => {
   if (!name.trim() || !roomCode.trim()) {
@@ -132,10 +122,10 @@ function App() {
     const cleanRoomCode = roomCode.trim().toUpperCase();
     const cleanName = name.trim();
 
-    console.log("Joining room...");
-    console.log("Name:", cleanName);
-    console.log("Room code:", cleanRoomCode);
-    console.log("Profile image exists:", !!profileImage);
+    // console.log("Joining room...");
+    // console.log("Name:", cleanName);
+    // console.log("Room code:", cleanRoomCode);
+    // console.log("Profile image exists:", !!profileImage);
 
     const response = await fetch(
   `${API_URL || "http://localhost:8080"}/api/rooms/join`,
@@ -164,11 +154,9 @@ function App() {
 
     const member = await response.json();
 
-    console.log("Joined room:", member);
+    // console.log("Joined room:", member);
 
-    // ==========================================
     // SAVE MEMBER INFORMATION
-    // ==========================================
 
     localStorage.setItem(
       "roomId",
@@ -190,9 +178,7 @@ function App() {
       cleanRoomCode
     );
 
-    // ==========================================
     // SAVE JOINING MEMBER PROFILE IMAGE
-    // ==========================================
 
     localStorage.setItem(
       "profileImage",
@@ -201,18 +187,15 @@ function App() {
 
     setProfileImage(profileImage || "");
 
-    console.log(
-      "Joining member profile image saved:",
-      !!profileImage
-    );
+    // console.log(
+    //   "Joining member profile image saved:",
+    //   !!profileImage
+    // );
 
-    // ==========================================
     // ENTER ROOM
-    // ==========================================
 
     setInRoom(true);
 
-    // Remove /join/CODE from URL
     window.history.replaceState(
       {},
       "",
@@ -223,26 +206,21 @@ function App() {
 
   } catch (error) {
 
-    console.error(
-      "Join room error:",
-      error
-    );
+    // console.error(
+    //   "Join room error:",
+    //   error
+    // );
 
     alert("Could not join room");
   }
 };
 
-  // ==========================================
-  // IF USER IS IN ROOM
-  // ==========================================
 
   if (inRoom) {
     return <Room />;
   }
 
-  // ==========================================
   // MAIN PAGE
-  // ==========================================
 
   return (
     <div className="home-page">
@@ -288,9 +266,8 @@ function App() {
 
       <main className="home-content">
 
-        {/* ======================================
-            HOME
-        ====================================== */}
+            {/* HOME */}
+     
 
         {!mode && (
 
@@ -383,9 +360,7 @@ function App() {
 
         )}
 
-        {/* ======================================
-            CREATE ROOM
-        ====================================== */}
+            {/* CREATE ROOM */}
 
         {mode === "create" && (
 
@@ -459,9 +434,8 @@ function App() {
 
         )}
 
-        {/* ======================================
-            JOIN ROOM
-        ====================================== */}
+            {/* JOIN ROOM */}
+        
 
         {mode === "join" && (
 
@@ -486,7 +460,6 @@ function App() {
               Enter the details shared with you.
             </div>
 
-            {/* PROFILE IMAGE */}
 
             <ProfileImagePicker
               name={name}
@@ -541,7 +514,6 @@ function App() {
 
       </main>
 
-      {/* FOOTER */}
 
       <footer className="home-footer">
 

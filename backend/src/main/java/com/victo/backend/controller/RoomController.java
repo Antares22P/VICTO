@@ -66,91 +66,86 @@ public class RoomController {
         }
 
         @PostMapping("/join")
-public JoinResponse joinRoom(
-        @RequestBody JoinRoomRequest request) throws Exception {
+        public JoinResponse joinRoom(
+                        @RequestBody JoinRoomRequest request) throws Exception {
 
-    String roomCode = request.getRoomCode();
-    String name = request.getName();
-    String profileImage = request.getProfileImage();
+                String roomCode = request.getRoomCode();
+                String name = request.getName();
+                String profileImage = request.getProfileImage();
 
-    System.out.println("JOIN REQUEST");
-    System.out.println("Room code: " + roomCode);
-    System.out.println("Name: " + name);
-    System.out.println("Profile image exists: " + (profileImage != null && !profileImage.isEmpty()));
+                // System.out.println("JOIN REQUEST");
+                // System.out.println("Room code: " + roomCode);
+                // System.out.println("Name: " + name);
+                // System.out.println("Profile image exists: " + (profileImage != null && !profileImage.isEmpty()));
 
-    DatabaseReference database =
-            FirebaseDatabase.getInstance().getReference();
+                DatabaseReference database = FirebaseDatabase.getInstance().getReference();
 
-    DatabaseReference roomCodeRef = database
-            .child("roomCodes")
-            .child(roomCode.toUpperCase());
+                DatabaseReference roomCodeRef = database
+                                .child("roomCodes")
+                                .child(roomCode.toUpperCase());
 
-    final String[] roomId = { null };
-    final Exception[] error = { null };
+                final String[] roomId = { null };
+                final Exception[] error = { null };
 
-    java.util.concurrent.CountDownLatch latch =
-            new java.util.concurrent.CountDownLatch(1);
+                java.util.concurrent.CountDownLatch latch = new java.util.concurrent.CountDownLatch(1);
 
-    roomCodeRef.addListenerForSingleValueEvent(
-            new com.google.firebase.database.ValueEventListener() {
+                roomCodeRef.addListenerForSingleValueEvent(
+                                new com.google.firebase.database.ValueEventListener() {
 
-                @Override
-                public void onDataChange(DataSnapshot snapshot) {
+                                        @Override
+                                        public void onDataChange(DataSnapshot snapshot) {
 
-                    System.out.println(
-                            "Firebase room lookup: "
-                                    + snapshot.exists()
-                    );
+                                                // System.out.println(
+                                                //                 "Firebase room lookup: "
+                                                //                                 + snapshot.exists());
 
-                    roomId[0] = snapshot.getValue(String.class);
+                                                roomId[0] = snapshot.getValue(String.class);
 
-                    latch.countDown();
+                                                latch.countDown();
+                                        }
+
+                                        @Override
+                                        public void onCancelled(
+                                                        com.google.firebase.database.DatabaseError firebaseError) {
+
+                                                error[0] = firebaseError.toException();
+
+                                                latch.countDown();
+                                        }
+                                });
+
+                latch.await();
+
+                if (error[0] != null) {
+                        throw error[0];
                 }
 
-                @Override
-                public void onCancelled(
-                        com.google.firebase.database.DatabaseError firebaseError) {
-
-                    error[0] = firebaseError.toException();
-
-                    latch.countDown();
+                if (roomId[0] == null) {
+                        throw new RuntimeException("Room not found");
                 }
-            });
 
-    latch.await();
+                String memberId = UUID.randomUUID().toString();
 
-    if (error[0] != null) {
-        throw error[0];
-    }
+                Member member = new Member(
+                                memberId,
+                                name,
+                                System.currentTimeMillis(),
+                                true,
+                                profileImage);
 
-    if (roomId[0] == null) {
-        throw new RuntimeException("Room not found");
-    }
+                database
+                                .child("rooms")
+                                .child(roomId[0])
+                                .child("members")
+                                .child(memberId)
+                                .setValueAsync(member)
+                                .get();
 
-    String memberId = UUID.randomUUID().toString();
-
-    Member member = new Member(
-            memberId,
-            name,
-            System.currentTimeMillis(),
-            true,
-            profileImage
-    );
-
-    database
-            .child("rooms")
-            .child(roomId[0])
-            .child("members")
-            .child(memberId)
-            .setValueAsync(member)
-            .get();
-
-    return new JoinResponse(
-            roomId[0],
-            memberId,
-            name
-    );
-}
+                return new JoinResponse(
+                                roomId[0],
+                                memberId,
+                                name);
+        }
 
         private String generateRoomCode() {
 

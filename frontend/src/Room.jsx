@@ -609,7 +609,7 @@ function Room() {
       (snapshot) => {
         const data = snapshot.val() || {};
 
-        console.log("Firebase members:", data);
+        // console.log("Firebase members:", data);
 
         setMembers(data);
       },
@@ -922,7 +922,7 @@ function Room() {
           updatedAt: Date.now(),
         };
 
-        console.log("My location:", location);
+        // console.log("My location:", location);
 
         try {
           const response = await fetch(
@@ -946,7 +946,7 @@ function Room() {
             return;
           }
 
-          console.log("Location updated successfully");
+          // console.log("Location updated successfully");
         } catch (error) {
           console.error("Location update failed:", error);
         }
@@ -1002,7 +1002,7 @@ function Room() {
         throw new Error("Failed to save destination");
       }
 
-      console.log("Destination saved");
+      // console.log("Destination saved");
 
       alert("Destination set successfully!");
 
@@ -1052,7 +1052,7 @@ function Room() {
         setLoadingMemberRoute(false);
       }
 
-      console.log("Destination removed");
+      // console.log("Destination removed");
     } catch (error) {
       console.error("Remove destination error:", error);
 
@@ -1060,21 +1060,15 @@ function Room() {
     }
   };
 
-  // ====================================================
   // CANCEL DESTINATION
-  // ====================================================
 
   const cancelDestination = () => {
     setSelectedDestination(null);
   };
 
-  // ====================================================
   // SELECT MEMBER
-  // ====================================================
 
   const selectMember = async (id) => {
-    // Clicking same member closes
-    // the selection.
     if (selectedMemberId === id) {
       setSelectedMemberId(null);
       setSelectedMemberRoute(null);
@@ -1092,9 +1086,7 @@ function Room() {
       return;
     }
 
-    // --------------------------------------------------
     // MEMBER LOCATION
-    // --------------------------------------------------
 
     if (!member.location) {
       return;
@@ -1107,9 +1099,7 @@ function Room() {
       return;
     }
 
-    // --------------------------------------------------
     // DESTINATION
-    // --------------------------------------------------
 
     if (!member.destination) {
       return;
@@ -1122,9 +1112,7 @@ function Room() {
       return;
     }
 
-    // --------------------------------------------------
     // OSRM ROUTE
-    // --------------------------------------------------
 
     setLoadingMemberRoute(true);
 
@@ -1169,9 +1157,7 @@ function Room() {
     }
   };
 
-  // ====================================================
   // FORMAT DISTANCE
-  // ====================================================
 
   const formatDistance = (meters) => {
     if (!Number.isFinite(meters)) {
@@ -1185,9 +1171,7 @@ function Room() {
     return `${(meters / 1000).toFixed(2)} km`;
   };
 
-  // ====================================================
   // FORMAT ETA
-  // ====================================================
 
   const formatDuration = (seconds) => {
     if (!Number.isFinite(seconds)) {
@@ -1211,9 +1195,7 @@ function Room() {
     return `${hours} hr ${remainingMinutes} min`;
   };
 
-  // ====================================================
   // MY LOCATION
-  // ====================================================
 
   const goToMyLocation = () => {
     const me = members[memberId];
@@ -1243,28 +1225,21 @@ function Room() {
     );
   };
 
-  // ====================================================
   // CURRENT SELECTED MEMBER
-  // ====================================================
 
   const selectedMember = selectedMemberId ? members[selectedMemberId] : null;
 
-  // ====================================================
   // RENDER
-  // ====================================================
 
   return (
     <div className="room-app">
-      {/* ==================================================
-    LEAVE ROOM
-================================================== */}
+
+    {/* LEAVE ROOM */}
 
       <button type="button" className="leave-room-button" onClick={leaveRoom}>
         ← Leave
       </button>
-      {/* ==================================================
-          NEARBY MEMBER NOTIFICATION
-      ================================================== */}
+          {/* NEARBY MEMBER NOTIFICATION */}
 
       {nearbyNotification && (
         <div className="victo-nearby-notification" role="status">
@@ -1290,9 +1265,9 @@ function Room() {
         </div>
       )}
 
-      {/* ==================================================
+      {/*
           TOP BAR
-      ================================================== */}
+      */}
 
       <div className="top-bar">
         <div className="room-info">
@@ -1308,13 +1283,8 @@ function Room() {
         </div>
       </div>
 
-      {/* ==================================================
-          MEMBERS PANEL
-      ================================================== */}
+          {/* MEMBERS PANEL */}
 
-      {/* ==================================================
-    MEMBERS PANEL
-================================================== */}
 
       {membersPanelOpen ? (
         <div className="members-panel premium-members-panel">
@@ -1524,10 +1494,8 @@ function Room() {
           </span>
         </button>
       )}
-
-      {/* ==================================================
-          BOTTOM SECTION
-      ================================================== */}
+{/* 
+          BOTTOM SECTION */}
 
       <BottomSection
         followMe={followMe}
@@ -1540,10 +1508,8 @@ function Room() {
         saveDestination={saveDestination}
         cancelDestination={cancelDestination}
       />
-
-      {/* ==================================================
-          TERRAIN BUTTON
-      ================================================== */}
+{/* 
+          TERRAIN BUTTON */}
 
       <button
         className={`terrain-button ${satelliteMode ? "terrain-active" : ""}`}
@@ -1551,14 +1517,10 @@ function Room() {
       >
         {satelliteMode ? "🛰 Satellite" : "🗺 Terrain"}
       </button>
-      {/* ==================================================
-          MAP
-      ================================================== */}
+          {/* MAP */}
 
       <MapContainer center={[22.5726, 88.3639]} zoom={13} className="room-map">
-        {/* ----------------------------------------------
-            MAP CONTROLLERS
-        ---------------------------------------------- */}
+            {/* MAP CONTROLLERS */}
 
         <RecenterMap
           members={members}
@@ -1566,9 +1528,7 @@ function Room() {
           followMe={followMe}
         />
 
-        {/* ----------------------------------------------
-            DARK MAP
-        ---------------------------------------------- */}
+            {/* DARK MAP */}
 
         <TileLayer
           attribution={satelliteMode ? "&copy; Esri" : "&copy; Carto"}
@@ -1579,9 +1539,7 @@ function Room() {
           }
         />
 
-        {/* ----------------------------------------------
-            MAP CLICK
-        ---------------------------------------------- */}
+            {/* MAP CLICK  */}
 
         <MapClickHandler
           onSelect={(destination) => {
@@ -1589,9 +1547,7 @@ function Room() {
           }}
         />
 
-        {/* ----------------------------------------------
-    MESH
----------------------------------------------- */}
+    {/* MESH */}
 
         {meshEnabled &&
           (() => {
@@ -1656,9 +1612,7 @@ function Room() {
             return meshLines;
           })()}
 
-        {/* ----------------------------------------------
-    ALL MEMBER → ALL DESTINATION ROUTES
----------------------------------------------- */}
+    {/* ALL MEMBER → ALL DESTINATION ROUTES */}
 
         {memberRoutes.map((route, index) => {
           if (!route?.coordinates?.length) {
@@ -1701,9 +1655,7 @@ function Room() {
             </Polyline>
           );
         })}
-        {/* ----------------------------------------------
-            MEMBER LOCATIONS
-        ---------------------------------------------- */}
+            {/* MEMBER LOCATIONS */}
 
         {Object.entries(members).map(([id, member]) => {
           if (!member.location) {
@@ -1867,9 +1819,7 @@ function Room() {
           );
         })}
 
-        {/* ----------------------------------------------
-            SAVED DESTINATIONS
-        ---------------------------------------------- */}
+            {/* SAVED DESTINATIONS */}
 
         {Object.entries(members).map(([id, member]) => {
           if (!member.destination) {
@@ -1887,9 +1837,7 @@ function Room() {
           );
         })}
 
-        {/* ----------------------------------------------
-            TEMPORARY DESTINATION
-        ---------------------------------------------- */}
+            {/* TEMPORARY DESTINATION */}
 
         {selectedDestination && (
           <Marker position={[selectedDestination.lat, selectedDestination.lng]}>
@@ -1905,8 +1853,5 @@ function Room() {
   );
 }
 
-// ======================================================
-// EXPORT
-// ======================================================
 
 export default Room;

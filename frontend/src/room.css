@@ -1,6 +1,4 @@
-/* =========================================================
-   VICTO ROOM
-========================================================= */
+
 
 * {
   box-sizing: border-box;
@@ -19,9 +17,6 @@ body {
   overflow: hidden;
 }
 
-/* =========================================================
-   ROOM APP
-========================================================= */
 
 .room-app {
   width: 100%;
@@ -45,9 +40,7 @@ body {
     sans-serif;
 }
 
-/* =========================================================
-   MAP
-========================================================= */
+
 
 .room-map {
   width: 100%;
@@ -69,9 +62,7 @@ body {
     sans-serif;
 }
 
-/* =========================================================
-   TOP BAR
-========================================================= */
+
 
 .top-bar {
   position: absolute;
@@ -110,9 +101,7 @@ body {
   pointer-events: auto;
 }
 
-/* =========================================================
-   ROOM INFO
-========================================================= */
+
 
 .room-info {
   display: flex;
@@ -186,55 +175,7 @@ body {
   font-weight: 800;
 }
 
-/* =========================================================
-   MEMBERS PANEL
-========================================================= */
 
-/* .members-panel {
-  position: absolute;
-
-  z-index: 1000;
-
-  top: 84px;
-  right: 12px;
-
-  width: 350px;
-
-  max-width: calc(100vw - 24px);
-
-  max-height: calc(100vh - 160px);
-
-  padding: 18px;
-
-  overflow-y: auto;
-
-  background:
-    linear-gradient(
-      145deg,
-      rgba(15, 18, 31, 0.94),
-      rgba(12, 14, 24, 0.90)
-    );
-
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-
-  border:
-    1px solid rgba(255, 255, 255, 0.09);
-
-  border-radius: 20px;
-
-  color: white;
-
-  box-shadow:
-    0 24px 60px rgba(0, 0, 0, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
-
-  scrollbar-width: thin;
-
-  scrollbar-color:
-    rgba(255, 255, 255, 0.12)
-    transparent;
-} */
 
 .members-panel::-webkit-scrollbar {
   width: 5px;
@@ -250,9 +191,6 @@ body {
   border-radius: 10px;
 }
 
-/* =========================================================
-   MEMBERS TITLE
-========================================================= */
 
 .members-title {
   display: flex;
@@ -290,9 +228,6 @@ body {
   letter-spacing: 1px;
 }
 
-/* =========================================================
-   MEMBER ROW
-========================================================= */
 
 .member-row {
   position: relative;
@@ -347,9 +282,7 @@ body {
   transform: scale(0.985);
 }
 
-/* =========================================================
-   SELECTED MEMBER ROW
-========================================================= */
+
 
 .member-row-selected {
   background: linear-gradient(
@@ -386,15 +319,7 @@ body {
   background: rgba(99, 102, 241, 0.18);
 }
 
-/*
-   The current Room.jsx also uses inline selected
-   styles, so this class remains available for
-   future cleanup.
-*/
 
-/* =========================================================
-   MEMBER AVATAR / MARKER
-========================================================= */
 
 .victo-member-marker {
   background: transparent !important;
@@ -408,9 +333,7 @@ body {
   cursor: pointer;
 }
 
-/* =========================================================
-   MEMBER NAME
-========================================================= */
+
 
 .member-name {
   min-width: 0;
@@ -428,9 +351,7 @@ body {
   white-space: nowrap;
 }
 
-/* =========================================================
-   MEMBER STATUS
-========================================================= */
+
 
 .member-status {
   margin-top: 2px;
@@ -442,9 +363,7 @@ body {
   color: #6b7280;
 }
 
-/* =========================================================
-   MEMBER DESTINATION INDICATOR
-========================================================= */
+
 
 .member-destination-indicator {
   flex-shrink: 0;
@@ -467,9 +386,6 @@ body {
   font-size: 13px;
 }
 
-/* =========================================================
-   SELECTED MEMBER DETAILS
-========================================================= */
 
 .selected-member-details {
   margin-top: 12px;
@@ -479,9 +395,7 @@ body {
   border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-/* =========================================================
-   SELECTED MEMBER TITLE
-========================================================= */
+
 
 .selected-member-title {
   margin-bottom: 8px;
@@ -495,9 +409,7 @@ body {
   color: #8d98ad;
 }
 
-/* =========================================================
-   SELECTED MEMBER HEADER
-========================================================= */
+
 
 .selected-member-header {
   display: flex;
@@ -535,9 +447,7 @@ body {
   color: #4ade80;
 }
 
-/* =========================================================
-   SELECTED MEMBER ROUTE DATA
-========================================================= */
+
 
 .selected-member-route-data {
   display: grid;
@@ -547,9 +457,7 @@ body {
   gap: 7px;
 }
 
-/* =========================================================
-   ROUTE STAT
-========================================================= */
+
 
 .selected-member-route-stat {
   padding: 9px;
@@ -577,9 +485,7 @@ body {
   color: white;
 }
 
-/* =========================================================
-   ROUTE LOADING
-========================================================= */
+
 
 .selected-member-route-loading {
   padding: 8px 0;
@@ -589,9 +495,7 @@ body {
   color: #aab3c5;
 }
 
-/* =========================================================
-   NO DESTINATION
-========================================================= */
+
 
 .selected-member-no-destination {
   font-size: 12px;
@@ -601,17 +505,12 @@ body {
   color: #8d98ad;
 }
 
-/* =========================================================
-   SELECTED MEMBER ROUTE LINE
-========================================================= */
 
 .room-map .leaflet-overlay-pane path {
   transition: opacity 0.2s ease;
 }
 
-/* =========================================================
-   BOTTOM CONTROLS
-========================================================= */
+
 
 .bottom-controls {
   position: absolute;
@@ -650,9 +549,6 @@ body {
   max-width: calc(100vw - 24px);
 }
 
-/* =========================================================
-   MESH
-========================================================= */
 
 .mesh-distance-label {
   background: rgba(9, 12, 21, 0.88) !important;
@@ -682,10 +578,7 @@ body {
   display: none !important;
 }
 
-/* =========================================================
-   CONTROL BUTTON
-========================================================= */
-
+  
 .control-button {
   border: 1px solid transparent;
 
@@ -775,9 +668,7 @@ body {
   box-shadow: 0 10px 28px rgba(99, 102, 241, 0.38);
 }
 
-/* =========================================================
-   DESTINATION ACTIONS
-========================================================= */
+
 
 .destination-actions {
   position: absolute;
@@ -812,9 +703,6 @@ body {
   max-width: calc(100vw - 32px);
 }
 
-/* =========================================================
-   DESTINATION BUTTONS
-========================================================= */
 
 .destination-save,
 .destination-cancel {
@@ -865,9 +753,7 @@ body {
   transform: scale(0.97);
 }
 
-/* =========================================================
-   DESTINATION MARKER
-========================================================= */
+
 
 .victo-destination-icon-wrapper {
   background: transparent !important;
@@ -877,9 +763,6 @@ body {
   overflow: visible !important;
 }
 
-/* =========================================================
-   DESTINATION MARKER CONTAINER
-========================================================= */
 
 .victo-destination-marker {
   position: relative;
@@ -891,9 +774,7 @@ body {
   pointer-events: auto;
 }
 
-/* =========================================================
-   DESTINATION PIN
-========================================================= */
+
 
 .victo-destination-pin {
   position: absolute;
@@ -933,9 +814,6 @@ body {
   box-shadow: 0 7px 22px rgba(244, 63, 94, 0.58);
 }
 
-/* =========================================================
-   DESTINATION PIN INNER
-========================================================= */
 
 .victo-destination-pin-inner {
   width: 10px;
@@ -947,9 +825,6 @@ body {
   background: white;
 }
 
-/* =========================================================
-   DESTINATION LABEL
-========================================================= */
 
 .victo-destination-label {
   position: absolute;
@@ -979,9 +854,7 @@ body {
   box-shadow: 0 5px 18px rgba(0, 0, 0, 0.28);
 }
 
-/* =========================================================
-   REMOVE DESTINATION BUTTON
-========================================================= */
+
 
 .victo-destination-remove {
   position: absolute;
@@ -1037,9 +910,6 @@ body {
   box-shadow: 0 5px 16px rgba(239, 68, 68, 0.32);
 }
 
-/* =========================================================
-   SHOW REMOVE BUTTON ON HOVER
-========================================================= */
 
 .victo-destination-marker:hover .victo-destination-remove {
   opacity: 1;
@@ -1059,17 +929,13 @@ body {
   transform: translateY(0) scale(0.96);
 }
 
-/* =========================================================
-   DESTINATION MARKER POPUP
-========================================================= */
+
 
 .victo-destination-marker + .leaflet-popup {
   z-index: 2000;
 }
 
-/* =========================================================
-   NEARBY MEMBER NOTIFICATION
-========================================================= */
+
 
 .victo-nearby-notification {
   position: absolute;
@@ -1110,9 +976,7 @@ body {
   animation: victoNearbyIn 0.25s ease forwards;
 }
 
-/* =========================================================
-   NEARBY NOTIFICATION ICON
-========================================================= */
+
 
 .victo-nearby-notification-icon {
   width: 34px;
@@ -1136,9 +1000,6 @@ body {
   font-size: 17px;
 }
 
-/* =========================================================
-   NEARBY NOTIFICATION CONTENT
-========================================================= */
 
 .victo-nearby-notification-title {
   margin-bottom: 2px;
@@ -1164,9 +1025,7 @@ body {
   color: white;
 }
 
-/* =========================================================
-   NEARBY NOTIFICATION CLOSE
-========================================================= */
+
 
 .victo-nearby-notification-close {
   margin-left: auto;
@@ -1208,9 +1067,6 @@ body {
   color: white;
 }
 
-/* =========================================================
-   NEARBY NOTIFICATION ANIMATION
-========================================================= */
 
 @keyframes victoNearbyIn {
   from {
@@ -1226,9 +1082,6 @@ body {
   }
 }
 
-/* =========================================================
-   TERRAIN BUTTON
-========================================================= */
 
 .terrain-button {
   position: absolute;
@@ -1273,9 +1126,6 @@ body {
   transform: scale(0.97);
 }
 
-/* =========================================================
-   LEAFLET POPUP
-========================================================= */
 
 .leaflet-popup-content-wrapper {
   border-radius: 10px;
@@ -1303,9 +1153,7 @@ body {
   background: white;
 }
 
-/* =========================================================
-   LEAFLET CLOSE BUTTON
-========================================================= */
+
 
 .leaflet-container a.leaflet-popup-close-button {
   color: #6b7280;
@@ -1319,9 +1167,7 @@ body {
   color: #111827;
 }
 
-/* =========================================================
-   LEAFLET ZOOM CONTROL
-========================================================= */
+
 
 .room-app .leaflet-control-zoom {
   margin-left: 16px;
@@ -1370,9 +1216,7 @@ body {
   border-radius: 0 0 9px 9px;
 }
 
-/* =========================================================
-   LEAFLET ATTRIBUTION
-========================================================= */
+
 
 .room-app .leaflet-control-attribution {
   background: rgba(10, 15, 24, 0.7);
@@ -1390,17 +1234,12 @@ body {
   color: #c7d2fe;
 }
 
-/* =========================================================
-   MEMBER MARKER POPUP
-========================================================= */
 
 .victo-member-marker {
   pointer-events: auto;
 }
 
-/* =========================================================
-   TABLET
-========================================================= */
+
 
 @media (max-width: 900px) {
   .top-bar {
@@ -1444,9 +1283,6 @@ body {
   }
 }
 
-/* =========================================================
-   SMALL TABLET / LARGE PHONE
-========================================================= */
 
 @media (max-width: 700px) {
   .top-bar {
@@ -1471,7 +1307,6 @@ body {
     font-size: 11px;
   }
 
-  /* MEMBERS */
 
   .members-panel {
     top: 76px;
@@ -1495,7 +1330,6 @@ body {
     font-size: 10px;
   }
 
-  /* BOTTOM */
 
   .bottom-controls {
     bottom: 14px;
@@ -1519,7 +1353,6 @@ body {
     font-size: 12px;
   }
 
-  /* DESTINATION ACTIONS */
 
   .destination-actions {
     bottom: 72px;
@@ -1538,7 +1371,6 @@ body {
     font-size: 12px;
   }
 
-  /* TERRAIN */
 
   .terrain-button {
     left: 10px;
@@ -1552,7 +1384,6 @@ body {
     font-size: 12px;
   }
 
-  /* NEARBY */
 
   .victo-nearby-notification {
     top: 76px;
@@ -1564,7 +1395,6 @@ body {
     max-width: calc(100vw - 24px);
   }
 
-  /* ZOOM */
 
   .room-app .leaflet-control-zoom {
     margin-top: 66px;
@@ -1573,9 +1403,7 @@ body {
   }
 }
 
-/* =========================================================
-   MOBILE
-========================================================= */
+
 
 @media (max-width: 520px) {
   .top-bar {
@@ -1604,7 +1432,6 @@ body {
     font-size: 10px;
   }
 
-  /* MEMBERS PANEL */
 
   .members-panel {
     top: 66px;
@@ -1642,7 +1469,6 @@ body {
     font-size: 9px;
   }
 
-  /* SELECTED MEMBER */
 
   .selected-member-route-data {
     gap: 5px;
@@ -1660,7 +1486,6 @@ body {
     font-size: 12px;
   }
 
-  /* BOTTOM */
 
   .bottom-controls {
     left: 50%;
@@ -1696,7 +1521,6 @@ body {
     text-overflow: ellipsis;
   }
 
-  /* DESTINATION ACTIONS */
 
   .destination-actions {
     left: 50%;
@@ -1733,7 +1557,6 @@ body {
     text-overflow: ellipsis;
   }
 
-  /* TERRAIN */
 
   .terrain-button {
     left: 8px;
@@ -1749,7 +1572,6 @@ body {
     border-radius: 9px;
   }
 
-  /* NEARBY NOTIFICATION */
 
   .victo-nearby-notification {
     top: 62px;
@@ -1789,7 +1611,6 @@ body {
     font-size: 17px;
   }
 
-  /* DESTINATION */
 
   .victo-destination-marker {
     width: 145px;
@@ -1856,9 +1677,7 @@ body {
   }
 }
 
-/* =========================================================
-   VERY SMALL PHONES
-========================================================= */
+
 
 @media (max-width: 380px) {
   .room-detail {
@@ -1899,9 +1718,6 @@ body {
   }
 }
 
-/* =========================================================
-   LANDSCAPE MOBILE
-========================================================= */
 
 @media (max-height: 500px) and (orientation: landscape) {
   .top-bar {
@@ -1953,17 +1769,10 @@ body {
   }
 }
 
-/* =========================================================
-   HOVER DEVICE SUPPORT
-========================================================= */
+
 
 @media (hover: none) {
-  /*
-    Touch devices don't have a true hover state.
-
-    Keep the destination remove button visible
-    so users can still remove a destination.
-  */
+  
 
   .victo-destination-remove {
     opacity: 1;
@@ -1990,9 +1799,7 @@ body {
   }
 }
 
-/* =========================================================
-   FOCUS ACCESSIBILITY
-========================================================= */
+
 
 .control-button:focus-visible,
 .destination-save:focus-visible,
@@ -2005,9 +1812,7 @@ body {
   outline-offset: 2px;
 }
 
-/* =========================================================
-   REDUCED MOTION
-========================================================= */
+
 
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -2098,9 +1903,7 @@ body {
   transform: translateY(-1px);
 }
 
-/* ======================================================
-   PREMIUM MEMBER ROUTES
-====================================================== */
+
 
 .victo-route {
   filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.18));
@@ -2110,9 +1913,7 @@ body {
   filter: drop-shadow(0 0 7px rgba(255, 255, 255, 0.45));
 }
 
-/* ======================================================
-   PREMIUM LIVE LOCATION MARKER
-====================================================== */
+
 
 .victo-member-marker {
   background: transparent !important;
@@ -2132,9 +1933,7 @@ body {
   pointer-events: auto;
 }
 
-/* ------------------------------------------------------
-   AVATAR
------------------------------------------------------- */
+
 
 .victo-live-avatar {
   position: relative;
@@ -2169,9 +1968,7 @@ body {
   object-fit: cover;
 }
 
-/* ------------------------------------------------------
-   ONLINE DOT
------------------------------------------------------- */
+
 
 .victo-live-status {
   position: absolute;
@@ -2191,9 +1988,7 @@ body {
   box-shadow: 0 0 8px rgba(34, 197, 94, 0.55);
 }
 
-/* ------------------------------------------------------
-   MY LOCATION
------------------------------------------------------- */
+
 
 .victo-live-marker-me .victo-live-avatar {
   border-width: 2px;
@@ -2203,9 +1998,7 @@ body {
     0 0 18px rgba(34, 211, 238, 0.45);
 }
 
-/* ------------------------------------------------------
-   PULSE
------------------------------------------------------- */
+
 
 .victo-live-pulse {
   position: absolute;
@@ -2245,9 +2038,6 @@ body {
   }
 }
 
-/* ======================================================
-   PREMIUM DESTINATION
-====================================================== */
 
 .victo-destination-icon-wrapper {
   background: transparent !important;
@@ -2263,9 +2053,6 @@ body {
   pointer-events: none;
 }
 
-/* ------------------------------------------------------
-   PIN
------------------------------------------------------- */
 
 .victo-destination-pin {
   position: absolute;
@@ -2310,9 +2097,7 @@ body {
   transform: rotate(45deg);
 }
 
-/* ------------------------------------------------------
-   DESTINATION PULSE
------------------------------------------------------- */
+
 
 .victo-destination-marker::before {
   content: "";
@@ -2380,9 +2165,7 @@ body {
   backdrop-filter: blur(12px);
 }
 
-/* =====================================================
-   PREMIUM MEMBERS PANEL
-===================================================== */
+
 
 .premium-members-panel {
   position: absolute;
@@ -2415,9 +2198,7 @@ body {
   overflow: hidden;
 }
 
-/* =====================================================
-   HEADER
-===================================================== */
+
 
 .members-panel-header {
   display: flex;
@@ -2502,9 +2283,7 @@ body {
   transform: translateY(-1px);
 }
 
-/* =====================================================
-   MEMBER LIST
-===================================================== */
+
 
 .members-list {
   display: flex;
@@ -2534,9 +2313,7 @@ body {
   border-radius: 20px;
 }
 
-/* =====================================================
-   MEMBER ROW
-===================================================== */
+
 
 .premium-member-row {
   position: relative;
@@ -2581,9 +2358,7 @@ body {
   border-color: rgba(99, 102, 241, 0.24);
 }
 
-/* =====================================================
-   LARGE PROFILE IMAGE
-===================================================== */
+
 
 .premium-member-avatar {
   position: relative;
@@ -2622,9 +2397,7 @@ body {
   font-size: 22px;
 }
 
-/* =====================================================
-   ONLINE DOT
-===================================================== */
+
 
 .member-online-dot {
   position: absolute;
@@ -2652,9 +2425,6 @@ body {
   background: #64748b;
 }
 
-/* =====================================================
-   MEMBER INFORMATION
-===================================================== */
 
 .premium-member-info {
   flex: 1;
@@ -2692,9 +2462,7 @@ body {
   color: #4ade80 !important;
 }
 
-/* =====================================================
-   YOU BADGE
-===================================================== */
+
 
 .premium-you-badge {
   padding: 2px 5px;
@@ -2714,9 +2482,7 @@ body {
   border: 1px solid rgba(99, 102, 241, 0.2);
 }
 
-/* =====================================================
-   DESTINATION INDICATOR
-===================================================== */
+
 
 .member-destination-indicator {
   width: 26px;
@@ -2740,9 +2506,6 @@ body {
   flex-shrink: 0;
 }
 
-/* =====================================================
-   SELECTED ARROW
-===================================================== */
 
 .member-selected-arrow {
   color: #a5b4fc;
@@ -2754,9 +2517,7 @@ body {
   margin-left: -2px;
 }
 
-/* =====================================================
-   SELECTED MEMBER CARD
-===================================================== */
+
 
 .selected-member-card {
   margin-top: 8px;
@@ -2875,9 +2636,7 @@ body {
   font-size: 12px;
 }
 
-/* =====================================================
-   COLLAPSED BUTTON
-===================================================== */
+
 
 .members-panel-collapsed {
   position: absolute;
@@ -2958,11 +2717,6 @@ body {
 
 
 
-
-/* =====================================================
-   LEAVE ROOM BUTTON
-===================================================== */
-
 .leave-room-button {
   position: absolute;
 
@@ -3024,9 +2778,6 @@ body {
 
 
 
-/* ======================================================
-   OFFLINE MEMBER MARKER
-====================================================== */
 
 .victo-live-marker-offline {
   filter: grayscale(100%);
