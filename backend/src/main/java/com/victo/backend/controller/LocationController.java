@@ -6,9 +6,9 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/location")
-// @CrossOrigin(origins = {
+@CrossOrigin(origins = {
     "http://localhost:5173",
-    "https://victo-stayconnected.vercel.app/"
+    "https://victo-stayconnected.vercel.app"
 })
 public class LocationController {
 

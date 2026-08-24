@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/member")
 @CrossOrigin(origins = {
     "http://localhost:5173",
-    "https://victo-stayconnected.vercel.app/"
+    "https://victo-stayconnected.vercel.app"
 })
 public class MemberController {
 

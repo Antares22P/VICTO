@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/destination")
 @CrossOrigin(origins = {
     "http://localhost:5173",
-    "https://victo-stayconnected.vercel.app/"
+    "https://victo-stayconnected.vercel.app"
 })
 public class DestinationController {
 
