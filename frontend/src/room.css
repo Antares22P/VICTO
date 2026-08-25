@@ -3127,3 +3127,40 @@ body {
     z-index: 1100 !important;
   }
 }
+
+/* =========================================================
+   DESTINATION ACTIONS — ALWAYS ABOVE BOTTOM CONTROLS
+   ========================================================= */
+
+.destination-actions {
+  position: absolute !important;
+  left: 50% !important;
+  bottom: 145px !important;
+  transform: translateX(-50%) !important;
+
+  z-index: 2000 !important;
+
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  width: max-content;
+  max-width: calc(100vw - 24px);
+}
+
+/* Bottom controls stay below destination actions */
+.bottom-controls {
+  z-index: 1000 !important;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .destination-actions {
+    bottom: 145px !important;
+  }
+
+  .bottom-controls {
+    bottom: 80px !important;
+  }
+}
