@@ -1759,7 +1759,7 @@ body {
 .control-button:focus-visible,
 .destination-save:focus-visible,
 .destination-cancel:focus-visible,
-.victo-destination-remove:focus-visible,
+ .victo-destination-remove:focus-visible,
 .victo-nearby-notification-close:focus-visible {
   outline: 2px solid #818cf8;
 
@@ -3066,5 +3066,45 @@ body {
 
   .room-app .leaflet-control-zoom {
     margin-top: 48px;
+  }
+}
+
+
+
+
+/* =========================================================
+   ANDROID / MOBILE SAFE AREA
+   ========================================================= */
+
+.bottom-controls {
+  bottom: calc(20px + env(safe-area-inset-bottom, 0px)) !important;
+}
+
+.destination-actions {
+  bottom: calc(78px + env(safe-area-inset-bottom, 0px)) !important;
+}
+
+.terrain-button {
+  bottom: calc(20px + env(safe-area-inset-bottom, 0px)) !important;
+}
+
+@media (max-width: 600px) {
+  .bottom-controls {
+    width: calc(100vw - 16px);
+    max-width: calc(100vw - 16px);
+
+    bottom: calc(20px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+}
+
+/* FINAL BOTTOM CONTROLS POSITION */
+
+.bottom-controls {
+  bottom: 80px !important;
+}
+
+@media (max-width: 600px) {
+  .bottom-controls {
+    bottom: 80px !important;
   }
 }
