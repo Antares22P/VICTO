@@ -2828,3 +2828,326 @@ body {
 .victo-live-marker-offline .victo-live-status {
   background: #6b7280 !important;
 }
+
+
+
+/* =========================================================
+   VICTO — FINAL MOBILE RESPONSIVE LAYOUT
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+  /* ---------- TOP BAR ---------- */
+
+  .top-bar {
+    top: max(8px, env(safe-area-inset-top));
+    left: 8px;
+    right: 8px;
+
+    width: auto;
+    min-height: 48px;
+
+    padding: 7px 10px;
+    border-radius: 14px;
+  }
+
+  .room-info {
+    width: 100%;
+    min-width: 0;
+    gap: 8px;
+  }
+
+  .room-brand {
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+
+  .room-detail {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+
+  /* ---------- MEMBERS PANEL ---------- */
+
+  .premium-members-panel,
+  .members-panel {
+    top: 66px;
+    right: 8px;
+    left: auto;
+
+    width: min(260px, calc(100vw - 16px));
+    max-width: calc(100vw - 16px);
+
+    max-height: calc(100dvh - 150px);
+
+    padding: 10px;
+    border-radius: 14px;
+
+    overflow-y: auto;
+  }
+
+  .members-list {
+    max-height: calc(100dvh - 220px);
+  }
+
+  .premium-member-row {
+    min-height: 48px;
+    gap: 8px;
+  }
+
+  .premium-member-avatar {
+    width: 42px;
+    height: 42px;
+  }
+
+  .premium-member-name {
+    font-size: 12px;
+  }
+
+  .premium-member-status {
+    font-size: 9px;
+  }
+
+
+  /* ---------- BOTTOM CONTROLS ---------- */
+
+  .bottom-controls {
+    left: 50%;
+    bottom: max(12px, env(safe-area-inset-bottom));
+
+    width: calc(100vw - 16px);
+    max-width: calc(100vw - 16px);
+
+    padding: 5px;
+    gap: 4px;
+
+    border-radius: 14px;
+
+    justify-content: center;
+  }
+
+  .control-button {
+    flex: 1;
+    min-width: 0;
+
+    min-height: 40px;
+
+    padding: 8px 5px;
+
+    font-size: 10px;
+    line-height: 1.1;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+
+  /* ---------- DESTINATION ACTIONS ---------- */
+
+  .destination-actions {
+    left: 50%;
+
+    bottom: calc(
+      max(12px, env(safe-area-inset-bottom)) + 58px
+    );
+
+    width: calc(100vw - 16px);
+    max-width: calc(100vw - 16px);
+
+    gap: 5px;
+    padding: 5px;
+
+    border-radius: 13px;
+  }
+
+  .destination-save,
+  .destination-cancel {
+    flex: 1;
+    min-width: 0;
+
+    min-height: 38px;
+
+    padding: 8px 6px;
+
+    font-size: 11px;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+
+  /* ---------- TERRAIN BUTTON ---------- */
+
+  .terrain-button {
+    left: 8px;
+
+    bottom: calc(
+      max(12px, env(safe-area-inset-bottom)) + 4px
+    );
+
+    min-height: 38px;
+
+    padding: 8px 10px;
+
+    font-size: 11px;
+
+    border-radius: 10px;
+  }
+
+
+  /* ---------- NEARBY NOTIFICATION ---------- */
+
+  .victo-nearby-notification {
+    top: 64px;
+
+    left: 12px;
+    right: 12px;
+
+    width: auto;
+    min-width: 0;
+    max-width: none;
+
+    padding: 10px 11px;
+
+    border-radius: 11px;
+  }
+
+
+  /* ---------- LEAFLET ZOOM ---------- */
+
+  .room-app .leaflet-control-zoom {
+    margin-top: 58px;
+    margin-left: 8px;
+  }
+
+  .room-app .leaflet-control-zoom a {
+    width: 32px;
+    height: 32px;
+    line-height: 32px;
+
+    font-size: 16px;
+  }
+
+
+  /* ---------- DESTINATION MARKER ---------- */
+
+  .victo-destination-marker {
+    width: 145px;
+    height: 72px;
+  }
+
+  .victo-destination-label {
+    max-width: 105px;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+
+/* =========================================================
+   VERY SMALL PHONES
+   ========================================================= */
+
+@media (max-width: 380px) {
+
+  .top-bar {
+    left: 6px;
+    right: 6px;
+
+    padding: 6px 9px;
+  }
+
+  .room-brand {
+    font-size: 14px;
+  }
+
+  .room-detail {
+    display: none;
+  }
+
+
+  .bottom-controls {
+    width: calc(100vw - 12px);
+    max-width: calc(100vw - 12px);
+
+    gap: 3px;
+    padding: 4px;
+  }
+
+  .control-button {
+    min-height: 38px;
+
+    padding: 7px 3px;
+
+    font-size: 9px;
+  }
+
+
+  .terrain-button {
+    left: 6px;
+
+    font-size: 10px;
+    padding: 7px 8px;
+  }
+
+
+  .premium-members-panel,
+  .members-panel {
+    right: 6px;
+
+    width: min(230px, calc(100vw - 12px));
+    max-width: calc(100vw - 12px);
+  }
+}
+
+
+/* =========================================================
+   LANDSCAPE PHONE
+   ========================================================= */
+
+@media (max-width: 900px) and (max-height: 500px) {
+
+  .top-bar {
+    top: 6px;
+    left: 8px;
+    right: 8px;
+
+    min-height: 42px;
+
+    padding: 5px 9px;
+  }
+
+  .room-brand {
+    font-size: 14px;
+  }
+
+  .members-panel,
+  .premium-members-panel {
+    top: 55px;
+
+    max-height: calc(100dvh - 75px);
+  }
+
+  .bottom-controls {
+    bottom: max(8px, env(safe-area-inset-bottom));
+  }
+
+  .destination-actions {
+    bottom: calc(
+      max(8px, env(safe-area-inset-bottom)) + 52px
+    );
+  }
+
+  .terrain-button {
+    bottom: max(8px, env(safe-area-inset-bottom));
+  }
+
+  .room-app .leaflet-control-zoom {
+    margin-top: 48px;
+  }
+}
