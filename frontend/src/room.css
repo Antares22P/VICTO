@@ -1084,51 +1084,6 @@ body {
   }
 }
 
-
-.terrain-button {
-  position: absolute;
-
-  z-index: 1000;
-
-  left: 16px;
-
-  bottom: 24px;
-
-  min-height: 42px;
-
-  padding: 11px 15px;
-
-  border: 1px solid rgba(255, 255, 255, 0.1);
-
-  border-radius: 10px;
-
-  background: rgba(10, 15, 24, 0.9);
-
-  color: white;
-
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-
-  font-size: 13px;
-
-  font-weight: 600;
-
-  cursor: pointer;
-
-  transition:
-    background 0.2s ease,
-    transform 0.2s ease;
-}
-
-.terrain-button:hover {
-  background: rgba(25, 34, 48, 0.95);
-}
-
-.terrain-button:active {
-  transform: scale(0.97);
-}
-
-
 .leaflet-popup-content-wrapper {
   border-radius: 10px;
 
@@ -1266,11 +1221,6 @@ body {
     right: 12px;
   }
 
-  .terrain-button {
-    left: 12px;
-
-    bottom: 18px;
-  }
 
   .bottom-controls {
     bottom: 18px;
@@ -1373,18 +1323,6 @@ body {
     font-size: 12px;
   }
 
-
-  .terrain-button {
-    left: 10px;
-
-    bottom: 14px;
-
-    min-height: 38px;
-
-    padding: 9px 11px;
-
-    font-size: 12px;
-  }
 
 
   .victo-nearby-notification {
@@ -1560,19 +1498,7 @@ body {
   }
 
 
-  .terrain-button {
-    left: 8px;
 
-    bottom: 64px;
-
-    min-height: 36px;
-
-    padding: 8px 10px;
-
-    font-size: 11px;
-
-    border-radius: 9px;
-  }
 
 
   .victo-nearby-notification {
@@ -1702,10 +1628,6 @@ body {
     padding-right: 4px;
   }
 
-  .terrain-button {
-    font-size: 10px;
-  }
-
   .destination-save,
   .destination-cancel {
     font-size: 10px;
@@ -1793,10 +1715,6 @@ body {
     bottom: 58px;
   }
 
-  .terrain-button {
-    bottom: 8px;
-  }
-
   .victo-nearby-notification {
     top: 55px;
   }
@@ -1841,7 +1759,6 @@ body {
 .control-button:focus-visible,
 .destination-save:focus-visible,
 .destination-cancel:focus-visible,
-.terrain-button:focus-visible,
 .victo-destination-remove:focus-visible,
 .victo-nearby-notification-close:focus-visible {
   outline: 2px solid #818cf8;
