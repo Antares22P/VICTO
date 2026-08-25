@@ -15,20 +15,17 @@ function App() {
   const [profileImage, setProfileImage] = useState(null);
   const [toast, setToast] = useState("");
 
-  const [inRoom, setInRoom] = useState(
-    !!localStorage.getItem("roomId")
-  );
-
+  const [inRoom, setInRoom] = useState(!!localStorage.getItem("roomId"));
 
   const showToast = (message) => {
-  setToast(message);
+    setToast(message);
 
-  setTimeout(() => {
-    setToast("");
-  }, 1500);
-};
+    setTimeout(() => {
+      setToast("");
+    }, 1500);
+  };
 
-<Analytics />
+  <Analytics />;
 
   // LOAD SAVED PROFILE IMAGE
 
@@ -38,6 +35,29 @@ function App() {
     if (savedProfileImage) {
       setProfileImage(savedProfileImage);
     }
+  }, []);
+
+  // SILENTLY WAKE UP BACKEND WHEN VICTo OPENS
+
+  useEffect(() => {
+    const wakeBackend = async () => {
+      try {
+        await fetch(`${API_URL}/api/hello`, {
+          method: "GET",
+          cache: "no-store",
+        });
+      } catch (error) {
+      }
+    };
+
+    wakeBackend();
+  }, []);
+
+  useEffect(() => {
+    fetch(`${API_URL}/api/hello`, {
+      method: "GET",
+      cache: "no-store",
+    }).catch(() => {});
   }, []);
 
   // CHECK INVITE LINK
@@ -68,18 +88,16 @@ function App() {
 
   // CREATE ROOM
 
-const createRoom = async () => {
-  if (!name.trim() || !roomName.trim()) {
-    showToast("Please enter your name and room name");
-    return;
-  }
+  const createRoom = async () => {
+    if (!name.trim() || !roomName.trim()) {
+      showToast("Please enter your name and room name");
+      return;
+    }
 
-  try {
-    const creatorId = crypto.randomUUID();
+    try {
+      const creatorId = crypto.randomUUID();
 
-    const response = await fetch(
-      `${API_URL || "API_URL"}/api/rooms`,
-      {
+      const response = await fetch(`${API_URL || "API_URL"}/api/rooms`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -90,141 +108,114 @@ const createRoom = async () => {
           creatorName: name.trim(),
           profileImage: profileImage || "",
         }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+
+        console.error("Create room error:", errorText);
+
+        throw new Error("Failed to create room");
       }
-    );
 
-    if (!response.ok) {
-      const errorText = await response.text();
+      const room = await response.json();
 
-      console.error("Create room error:", errorText);
+      localStorage.setItem("roomId", room.roomId);
+      localStorage.setItem("roomCode", room.roomCode);
+      localStorage.setItem("memberId", creatorId);
+      localStorage.setItem("name", name.trim());
+      localStorage.setItem("profileImage", profileImage || "");
 
-      throw new Error("Failed to create room");
+      setRoomCode(room.roomCode);
+      setInRoom(true);
+
+      showToast(`Room created • ${room.roomCode}`);
+    } catch (error) {
+      console.error("Create room error:", error);
+
+      showToast("Could not create room");
     }
-
-    const room = await response.json();
-
-    localStorage.setItem("roomId", room.roomId);
-    localStorage.setItem("roomCode", room.roomCode);
-    localStorage.setItem("memberId", creatorId);
-    localStorage.setItem("name", name.trim());
-    localStorage.setItem("profileImage", profileImage || "");
-
-    setRoomCode(room.roomCode);
-    setInRoom(true);
-
-    showToast(`Room created • ${room.roomCode}`);
-
-  } catch (error) {
-    console.error("Create room error:", error);
-
-    showToast("Could not create room");
-  }
-};
+  };
   // JOIN ROOM
 
   const joinRoom = async () => {
-  if (!name.trim() || !roomCode.trim()) {
-    alert("Enter your name and room code");
-    return;
-  }
-
-  try {
-    const cleanRoomCode = roomCode.trim().toUpperCase();
-    const cleanName = name.trim();
-
-    // console.log("Joining room...");
-    // console.log("Name:", cleanName);
-    // console.log("Room code:", cleanRoomCode);
-    // console.log("Profile image exists:", !!profileImage);
-
-    const response = await fetch(
-  `${API_URL || "API_URL"}/api/rooms/join`,
-  {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      roomCode: cleanRoomCode,
-      name: cleanName,
-      profileImage: profileImage || "",
-    }),
-  }
-);
-
-    if (!response.ok) {
-      const errorText = await response.text();
-
-      console.error("Join error:", errorText);
-
-      alert("Room not found");
-
+    if (!name.trim() || !roomCode.trim()) {
+      alert("Enter your name and room code");
       return;
     }
 
-    const member = await response.json();
+    try {
+      const cleanRoomCode = roomCode.trim().toUpperCase();
+      const cleanName = name.trim();
 
-    // console.log("Joined room:", member);
+      // console.log("Joining room...");
+      // console.log("Name:", cleanName);
+      // console.log("Room code:", cleanRoomCode);
+      // console.log("Profile image exists:", !!profileImage);
 
-    // SAVE MEMBER INFORMATION
+      const response = await fetch(`${API_URL || "API_URL"}/api/rooms/join`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          roomCode: cleanRoomCode,
+          name: cleanName,
+          profileImage: profileImage || "",
+        }),
+      });
 
-    localStorage.setItem(
-      "roomId",
-      member.roomId
-    );
+      if (!response.ok) {
+        const errorText = await response.text();
 
-    localStorage.setItem(
-      "memberId",
-      member.memberId
-    );
+        console.error("Join error:", errorText);
 
-    localStorage.setItem(
-      "name",
-      member.name || cleanName
-    );
+        alert("Room not found");
 
-    localStorage.setItem(
-      "roomCode",
-      cleanRoomCode
-    );
+        return;
+      }
 
-    // SAVE JOINING MEMBER PROFILE IMAGE
+      const member = await response.json();
 
-    localStorage.setItem(
-      "profileImage",
-      profileImage || ""
-    );
+      // console.log("Joined room:", member);
 
-    setProfileImage(profileImage || "");
+      // SAVE MEMBER INFORMATION
 
-    // console.log(
-    //   "Joining member profile image saved:",
-    //   !!profileImage
-    // );
+      localStorage.setItem("roomId", member.roomId);
 
-    // ENTER ROOM
+      localStorage.setItem("memberId", member.memberId);
 
-    setInRoom(true);
+      localStorage.setItem("name", member.name || cleanName);
 
-    window.history.replaceState(
-      {},
-      "",
-      "/"
-    );
+      localStorage.setItem("roomCode", cleanRoomCode);
 
-    alert("Joined room!");
+      // SAVE JOINING MEMBER PROFILE IMAGE
 
-  } catch (error) {
+      localStorage.setItem("profileImage", profileImage || "");
 
-    // console.error(
-    //   "Join room error:",
-    //   error
-    // );
+      setProfileImage(profileImage || "");
 
-    alert("Could not join room");
-  }
-};
+      // console.log(
+      //   "Joining member profile image saved:",
+      //   !!profileImage
+      // );
 
+      // ENTER ROOM
+
+      setInRoom(true);
+
+      window.history.replaceState({}, "", "/");
+
+      alert("Joined room!");
+    } catch (error) {
+      // console.error(
+      //   "Join room error:",
+      //   error
+      // );
+
+      alert("Could not join room");
+    }
+  };
 
   if (inRoom) {
     return <Room />;
@@ -234,7 +225,6 @@ const createRoom = async () => {
 
   return (
     <div className="home-page">
-
       {/* BACKGROUND */}
 
       <div className="home-glow home-glow-one"></div>
@@ -243,52 +233,32 @@ const createRoom = async () => {
       {/* HEADER */}
 
       <header className="home-header">
-
         <div className="home-logo">
-
-          <div className="home-logo-mark">
-            V
-          </div>
+          <div className="home-logo-mark">V</div>
 
           <div>
-            <div className="home-brand">
-              Victo
-            </div>
+            <div className="home-brand">Victo</div>
 
-            <div className="home-tagline">
-              Live together. Stay connected.
-            </div>
+            <div className="home-tagline">Live together. Stay connected.</div>
           </div>
-
         </div>
 
         <div className="home-status">
-
           <span className="home-status-dot"></span>
-
           Live location sharing
-
         </div>
-
       </header>
 
       {/* MAIN */}
 
       <main className="home-content">
-
-            {/* HOME */}
-     
+        {/* HOME */}
 
         {!mode && (
-
           <section className="home-hero">
-
             <div className="hero-badge">
-
               <span>●</span>
-
               REAL-TIME LOCATION
-
             </div>
 
             <h1>
@@ -298,41 +268,30 @@ const createRoom = async () => {
             </h1>
 
             <p className="hero-description">
-              Create a private room and share your live
-              location with the people who matter.
+              Create a private room and share your live location with the people
+              who matter.
             </p>
 
             {/* ACTION CARDS */}
 
             <div className="home-actions">
-
               {/* CREATE */}
 
               <button
                 className="home-action-card create-card"
                 onClick={() => setMode("create")}
               >
-
-                <div className="action-icon">
-                  +
-                </div>
+                <div className="action-icon">+</div>
 
                 <div className="action-content">
-
-                  <div className="action-title">
-                    Create a room
-                  </div>
+                  <div className="action-title">Create a room</div>
 
                   <div className="action-description">
                     Start a new private location room
                   </div>
-
                 </div>
 
-                <div className="action-arrow">
-                  →
-                </div>
-
+                <div className="action-arrow">→</div>
               </button>
 
               {/* JOIN */}
@@ -341,45 +300,27 @@ const createRoom = async () => {
                 className="home-action-card"
                 onClick={() => setMode("join")}
               >
-
-                <div className="action-icon join-icon">
-                  ↗
-                </div>
+                <div className="action-icon join-icon">↗</div>
 
                 <div className="action-content">
-
-                  <div className="action-title">
-                    Join a room
-                  </div>
+                  <div className="action-title">Join a room</div>
 
                   <div className="action-description">
                     Enter a room code to join your group
                   </div>
-
                 </div>
 
-                <div className="action-arrow">
-                  →
-                </div>
-
+                <div className="action-arrow">→</div>
               </button>
-
             </div>
-
           </section>
-
         )}
 
-            {/* CREATE ROOM */}
+        {/* CREATE ROOM */}
 
         {mode === "create" && (
-
           <section className="room-form-card">
-
-            <button
-              className="back-button"
-              onClick={() => setMode(null)}
-            >
+            <button className="back-button" onClick={() => setMode(null)}>
               ← Back
             </button>
 
@@ -387,9 +328,7 @@ const createRoom = async () => {
               +
             </div> */}
 
-            <div className="form-heading">
-              Create a room
-            </div>
+            <div className="form-heading">Create a room</div>
 
             <div className="form-subheading">
               Set up your private location space.
@@ -404,57 +343,36 @@ const createRoom = async () => {
             />
 
             <div className="form-fields">
-
-              <label>
-                Your name
-              </label>
+              <label>Your name</label>
 
               <input
                 placeholder="Enter your name"
                 value={name}
-                onChange={(e) =>
-                  setName(e.target.value)
-                }
+                onChange={(e) => setName(e.target.value)}
                 autoComplete="name"
               />
 
-              <label>
-                Room name
-              </label>
+              <label>Room name</label>
 
               <input
                 placeholder="e.g. Weekend Trip"
                 value={roomName}
-                onChange={(e) =>
-                  setRoomName(e.target.value)
-                }
+                onChange={(e) => setRoomName(e.target.value)}
               />
 
-              <button
-                className="primary-form-button"
-                onClick={createRoom}
-              >
+              <button className="primary-form-button" onClick={createRoom}>
                 Create Room
                 <span>→</span>
               </button>
-
             </div>
-
           </section>
-
         )}
 
-            {/* JOIN ROOM */}
-        
+        {/* JOIN ROOM */}
 
         {mode === "join" && (
-
           <section className="room-form-card">
-
-            <button
-              className="back-button"
-              onClick={() => setMode(null)}
-            >
+            <button className="back-button" onClick={() => setMode(null)}>
               ← Back
             </button>
 
@@ -462,14 +380,11 @@ const createRoom = async () => {
               ↗
             </div> */}
 
-            <div className="form-heading">
-              Join a room
-            </div>
+            <div className="form-heading">Join a room</div>
 
             <div className="form-subheading">
               Enter the details shared with you.
             </div>
-
 
             <ProfileImagePicker
               name={name}
@@ -478,86 +393,48 @@ const createRoom = async () => {
             />
 
             <div className="form-fields">
-
-              <label>
-                Your name
-              </label>
+              <label>Your name</label>
 
               <input
                 placeholder="Enter your name"
                 value={name}
-                onChange={(e) =>
-                  setName(e.target.value)
-                }
+                onChange={(e) => setName(e.target.value)}
                 autoComplete="name"
               />
 
-              <label>
-                Room code
-              </label>
+              <label>Room code</label>
 
               <input
                 className="room-code-input"
                 placeholder="XXXXXX"
                 value={roomCode}
                 maxLength={10}
-                onChange={(e) =>
-                  setRoomCode(
-                    e.target.value.toUpperCase()
-                  )
-                }
+                onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
               />
 
-              <button
-                className="primary-form-button"
-                onClick={joinRoom}
-              >
+              <button className="primary-form-button" onClick={joinRoom}>
                 Join Room
                 <span>→</span>
               </button>
-
             </div>
-
           </section>
-
         )}
-
       </main>
 
-
       <footer className="home-footer">
+        <span>Private rooms</span>
 
-        <span>
-          Private rooms
-        </span>
+        <span>•</span>
 
-        <span>
-          •
-        </span>
+        <span>Real-time sharing</span>
 
-        <span>
-          Real-time sharing
-        </span>
+        <span>•</span>
 
-        <span>
-          •
-        </span>
-
-        <span>
-          Built with Victo
-        </span>
-
+        <span>Built with Victo</span>
       </footer>
 
-      {toast && (
-  <div className="toast">
-    {toast}
-  </div>
-)}
-
+      {toast && <div className="toast">{toast}</div>}
     </div>
-
-    
   );
 }
 
