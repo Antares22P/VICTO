@@ -3186,7 +3186,7 @@ body {
 @media (max-width: 600px) {
   .terrain-button {
     right: 12px !important;
-    bottom: 95px !important;
+    bottom: 80px !important;
     width: auto !important;
   }
 }
