@@ -3169,17 +3169,24 @@ body {
    TERRAIN BUTTON — ABOVE BOTTOM CONTROLS
    ========================================================= */
 
+/* Terrain button — small button above BottomSection */
+
 .terrain-button {
   position: absolute !important;
   right: 18px !important;
-  bottom: 145px !important;
+  bottom: 95px !important;
   z-index: 1500 !important;
+
+  width: auto !important;
+  min-width: unset !important;
+  max-width: max-content !important;
 }
 
 /* Mobile */
 @media (max-width: 600px) {
   .terrain-button {
     right: 12px !important;
-    bottom: 145px !important;
+    bottom: 95px !important;
+    width: auto !important;
   }
 }
