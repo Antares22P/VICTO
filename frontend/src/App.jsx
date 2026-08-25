@@ -7,6 +7,19 @@ import { Analytics } from "@vercel/analytics/react";
 function App() {
   const API_URL = import.meta.env.VITE_API_URL;
 
+  useEffect(() => {
+  const wakeBackend = async () => {
+    try {
+      await fetch(`${API_URL}/api/hello`);
+      console.log("_");
+    } catch (error) {
+      console.log("..");
+    }
+  };
+
+  wakeBackend();
+}, []);
+
   const [mode, setMode] = useState(null);
 
   const [name, setName] = useState("");
@@ -26,6 +39,8 @@ function App() {
   };
 
   <Analytics />;
+
+  
 
   // LOAD SAVED PROFILE IMAGE
 
