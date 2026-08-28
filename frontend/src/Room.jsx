@@ -1533,9 +1533,7 @@ function Room() {
       <MapContainer
   center={[22.5726, 88.3639]}
   zoom={13}
-  className={`room-map ${
-    satelliteMode ? "satellite-mode" : "dark-mode"
-  }`}
+  className="room-map"
 >
   <RecenterMap
     members={members}
