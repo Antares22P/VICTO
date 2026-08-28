@@ -1534,7 +1534,7 @@ function Room() {
   center={[22.5726, 88.3639]}
   zoom={13}
   className={`room-map ${
-    satelliteMode ? "satellite-mode" : "dark-mode"
+    satelliteMode ? "satellite-mode" : "normal-mode"
   }`}
 >
   <RecenterMap
