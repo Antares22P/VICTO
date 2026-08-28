@@ -3192,40 +3192,23 @@ body {
 }
 
 
-/* Dark OpenStreetMap tiles */
-/* .leaflet-tile-pane {
-  filter: invert(100%) hue-rotate(180deg) brightness(65%) contrast(115%);
-} */
-
-/* ========================================
-   VICto DARK MAP
-======================================== */
-
-/* .dark-map-tiles {
-  filter:
-    grayscale(90%)
-    brightness(125%)
-    contrast(900%);
-} */
 
 /* =========================================
-   VICTO DARK MAP
-   Normal OSM map only
-========================================= */
+   VICTO MONOCHROME DARK MAP
+   ========================================= */
 
 .room-map.dark-mode .leaflet-tile-pane {
   filter:
     grayscale(100%)
-    /* invert(100%) */
-    brightness(145%)
-    contrast(100%);
+    invert(100%)
+    brightness(150%)
+    contrast(75%);
 }
 
 /* =========================================
-   SATELLITE MAP
-   Absolutely no filter
-========================================= */
+   SATELLITE — ORIGINAL COLORS
+   ========================================= */
 
 .room-map.satellite-mode .leaflet-tile-pane {
-  filter: none;
+  filter: none !important;
 }
