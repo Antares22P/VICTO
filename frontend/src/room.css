@@ -3216,7 +3216,7 @@ body {
 .room-map.dark-mode .leaflet-tile-pane {
   filter:
     grayscale(100%)
-    invert(100%)
+    /* invert(100%) */
     brightness(145%)
     contrast(100%);
 }
