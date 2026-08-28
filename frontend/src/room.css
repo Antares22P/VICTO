@@ -3201,7 +3201,7 @@ body {
    VICto DARK MAP
 ======================================== */
 
-.dark-map .leaflet-tile-pane {
+.dark-map-tiles {
   filter:
     grayscale(90%)
     /* invert(100%) */

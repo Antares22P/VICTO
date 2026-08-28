@@ -1550,17 +1550,18 @@ function Room() {
   ================================= */}
 
   <TileLayer
-    attribution={
-      satelliteMode
-        ? "&copy; Esri"
-        : "&copy; OpenStreetMap contributors"
-    }
-    url={
-      satelliteMode
-        ? "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-        : "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-    }
-  />
+  attribution={
+    satelliteMode
+      ? "&copy; Esri"
+      : "&copy; OpenStreetMap contributors"
+  }
+  url={
+    satelliteMode
+      ? "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+      : "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+  }
+  className={!satelliteMode ? "dark-map-tiles" : ""}
+/>
 
   {/* ================================
       MAP CLICK
