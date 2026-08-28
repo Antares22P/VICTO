@@ -1530,340 +1530,410 @@ function Room() {
       </button>
           {/* MAP */}
 
-      <MapContainer center={[22.5726, 88.3639]} zoom={13} className="room-map">
-            {/* MAP CONTROLLERS */}
+      <MapContainer
+  center={[22.5726, 88.3639]}
+  zoom={13}
+  className={`room-map ${!satelliteMode ? "dark-map" : ""}`}
+>
+  {/* ================================
+      MAP CONTROLLERS
+  ================================= */}
 
-        <RecenterMap
-          members={members}
-          memberId={memberId}
-          followMe={followMe}
-        />
+  <RecenterMap
+    members={members}
+    memberId={memberId}
+    followMe={followMe}
+  />
 
-            {/* DARK MAP */}
+  {/* ================================
+      MAP TILES
+  ================================= */}
 
-        <TileLayer
-  attribution={
-    satelliteMode
-      ? "&copy; Esri"
-      : '&copy; OpenStreetMap contributors &copy; Stadia Maps'
-  }
-  url={
-    satelliteMode
-      ? "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-      : "https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png"
-  }
-/>
+  <TileLayer
+    attribution={
+      satelliteMode
+        ? "&copy; Esri"
+        : "&copy; OpenStreetMap contributors"
+    }
+    url={
+      satelliteMode
+        ? "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+        : "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+    }
+  />
 
-            {/* MAP CLICK  */}
+  {/* ================================
+      MAP CLICK
+  ================================= */}
 
-        <MapClickHandler
-          onSelect={(destination) => {
-            setSelectedDestination(destination);
-          }}
-        />
+  <MapClickHandler
+    onSelect={(destination) => {
+      setSelectedDestination(destination);
+    }}
+  />
 
-    {/* MESH */}
+  {/* ================================
+      MEMBER MESH
+  ================================= */}
 
-        {meshEnabled &&
-          (() => {
-            const validMembers = Object.entries(members).filter(
-              ([id, member]) => {
-                if (!member?.location) {
-                  return false;
-                }
-
-                const lat = Number(member.location.lat);
-                const lng = Number(member.location.lng);
-
-                return Number.isFinite(lat) && Number.isFinite(lng);
-              },
-            );
-
-            const meshLines = [];
-
-            for (let i = 0; i < validMembers.length; i++) {
-              for (let j = i + 1; j < validMembers.length; j++) {
-                const [idA, memberA] = validMembers[i];
-                const [idB, memberB] = validMembers[j];
-
-                const latA = Number(memberA.location.lat);
-                const lngA = Number(memberA.location.lng);
-
-                const latB = Number(memberB.location.lat);
-                const lngB = Number(memberB.location.lng);
-
-                const distance = getDistanceMeters(latA, lngA, latB, lngB);
-
-                const middleLat = (latA + latB) / 2;
-
-                const middleLng = (lngA + lngB) / 2;
-
-                meshLines.push(
-                  <Polyline
-                    key={`mesh-${idA}-${idB}`}
-                    positions={[
-                      [latA, lngA],
-                      [latB, lngB],
-                    ]}
-                    pathOptions={{
-                      color: "#67e8f9",
-                      weight: 1,
-                      opacity: 0.65,
-                      dashArray: "2 6",
-                    }}
-                  >
-                    <Tooltip
-                      permanent
-                      direction="center"
-                      className="mesh-distance-label"
-                    >
-                      {formatDistance(distance)}
-                    </Tooltip>
-                  </Polyline>,
-                );
-              }
-            }
-
-            return meshLines;
-          })()}
-
-    {/* ALL MEMBER → ALL DESTINATION ROUTES */}
-
-        {memberRoutes.map((route, index) => {
-          if (!route?.coordinates?.length) {
-            return null;
-          }
-
-          const isSelected = route.memberId === selectedMemberId;
-
-          const routeColor = getRouteColor(route.memberId, members);
-
-          return (
-            <Polyline
-              key={
-                `route-${route.memberId}-` +
-                `${route.destinationMemberId}-${index}`
-              }
-              positions={route.coordinates}
-              pathOptions={{
-                color: routeColor,
-
-                weight: isSelected ? 6 : 3,
-
-                opacity: isSelected ? 0.95 : 0.55,
-
-                lineCap: "round",
-
-                lineJoin: "round",
-
-                className: isSelected ? "victo-route-selected" : "victo-route",
-              }}
-            >
-              <Tooltip sticky className="victo-route-tooltip">
-                {members[route.memberId]?.name || "Member"} →{" "}
-                {members[route.destinationMemberId]?.name || "Destination"}
-                <br />
-                {formatDistance(route.distance)}
-                {" • "}
-                {formatDuration(route.duration)}
-              </Tooltip>
-            </Polyline>
-          );
-        })}
-            {/* MEMBER LOCATIONS */}
-
-        {Object.entries(members).map(([id, member]) => {
-          if (!member.location) {
-            return null;
+  {meshEnabled &&
+    (() => {
+      const validMembers = Object.entries(members).filter(
+        ([id, member]) => {
+          if (!member?.location) {
+            return false;
           }
 
           const lat = Number(member.location.lat);
-
           const lng = Number(member.location.lng);
 
-          if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
-            return null;
-          }
+          return (
+            Number.isFinite(lat) &&
+            Number.isFinite(lng)
+          );
+        },
+      );
 
-          const isMe = id === memberId;
+      const meshLines = [];
 
-          const isOffline = member.online === false;
+      for (let i = 0; i < validMembers.length; i++) {
+        for (
+          let j = i + 1;
+          j < validMembers.length;
+          j++
+        ) {
+          const [idA, memberA] = validMembers[i];
+          const [idB, memberB] = validMembers[j];
 
-          const markerColor = isMe ? "#22d3ee" : getRouteColor(id, members);
+          const latA = Number(memberA.location.lat);
+          const lngA = Number(memberA.location.lng);
 
-          const markerClass = [
-            "victo-live-marker",
-            isMe ? "victo-live-marker-me" : "",
-            isOffline ? "victo-live-marker-offline" : "",
-          ]
-            .filter(Boolean)
-            .join(" ");
+          const latB = Number(memberB.location.lat);
+          const lngB = Number(memberB.location.lng);
 
-          const avatarHtml = member.profileImage
-  ? `
-    <div
-      class="${markerClass}"
-      style="--marker-color:${markerColor};"
-    >
+          const distance = getDistanceMeters(
+            latA,
+            lngA,
+            latB,
+            lngB,
+          );
 
-      ${
-        isMe && !isOffline
-          ? `
-            <div class="victo-live-pulse"></div>
-            <div class="victo-live-pulse pulse-delay"></div>
-          `
-          : ""
+          meshLines.push(
+            <Polyline
+              key={`mesh-${idA}-${idB}`}
+              positions={[
+                [latA, lngA],
+                [latB, lngB],
+              ]}
+              pathOptions={{
+                color: "#67e8f9",
+                weight: 1,
+                opacity: 0.65,
+                dashArray: "2 6",
+              }}
+            >
+              <Tooltip
+                permanent
+                direction="center"
+                className="mesh-distance-label"
+              >
+                {formatDistance(distance)}
+              </Tooltip>
+            </Polyline>,
+          );
+        }
       }
 
-      <div class="victo-live-avatar">
-        <img
-          src="${member.profileImage}"
-          alt=""
-        />
-      </div>
+      return meshLines;
+    })()}
 
-      <div
-        class="victo-live-status"
-        style="
-          background:${member.online ? "#22c55e" : "#6b7280"};
-        "
-      ></div>
+  {/* ================================
+      ALL MEMBER → ALL DESTINATION ROUTES
+  ================================= */}
 
-    </div>
-  `
-            : `
-      <div
-        class="victo-live-marker ${isMe ? "victo-live-marker-me" : ""}"
-        style="--marker-color:${markerColor};"
-      >
+  {memberRoutes.map((route, index) => {
+    if (!route?.coordinates?.length) {
+      return null;
+    }
 
-        ${
-          isMe
-            ? `
-              <div class="victo-live-pulse"></div>
-              <div class="victo-live-pulse pulse-delay"></div>
-            `
-            : ""
+    const isSelected =
+      route.memberId === selectedMemberId;
+
+    const routeColor = getRouteColor(
+      route.memberId,
+      members,
+    );
+
+    return (
+      <Polyline
+        key={
+          `route-${route.memberId}-` +
+          `${route.destinationMemberId}-${index}`
         }
-
-        <div
-          class="victo-live-avatar victo-live-avatar-emoji"
+        positions={route.coordinates}
+        pathOptions={{
+          color: routeColor,
+          weight: isSelected ? 6 : 3,
+          opacity: isSelected ? 0.95 : 0.55,
+          lineCap: "round",
+          lineJoin: "round",
+          className: isSelected
+            ? "victo-route-selected"
+            : "victo-route",
+        }}
+      >
+        <Tooltip
+          sticky
+          className="victo-route-tooltip"
         >
-          ${getInitialAvatar(member.name)}
-        </div>
+          {members[route.memberId]?.name || "Member"}
+          {" → "}
+          {members[route.destinationMemberId]?.name ||
+            "Destination"}
+          <br />
+          {formatDistance(route.distance)}
+          {" • "}
+          {formatDuration(route.duration)}
+        </Tooltip>
+      </Polyline>
+    );
+  })}
 
-        <div
-          class="victo-live-status"
-          style="
-            background:${member.online ? "#22c55e" : "#6b7280"};
-          "
-        ></div>
+  {/* ================================
+      MEMBER LOCATIONS
+  ================================= */}
 
-      </div>
-    `;
+  {Object.entries(members).map(
+    ([id, member]) => {
+      if (!member.location) {
+        return null;
+      }
 
-          return (
-            <Marker
-              key={`member-${id}`}
-              position={[lat, lng]}
-              icon={divIcon({
-                className: "victo-member-marker",
+      const lat = Number(member.location.lat);
+      const lng = Number(member.location.lng);
 
-                html: avatarHtml,
+      if (
+        !Number.isFinite(lat) ||
+        !Number.isFinite(lng)
+      ) {
+        return null;
+      }
 
-                iconSize: [58, 58],
+      const isMe = id === memberId;
 
-                iconAnchor: [29, 29],
-              })}
+      const isOffline = member.online === false;
+
+      const markerColor = isMe
+        ? "#22d3ee"
+        : getRouteColor(id, members);
+
+      const markerClass = [
+        "victo-live-marker",
+        isMe
+          ? "victo-live-marker-me"
+          : "",
+        isOffline
+          ? "victo-live-marker-offline"
+          : "",
+      ]
+        .filter(Boolean)
+        .join(" ");
+
+      const avatarHtml = member.profileImage
+        ? `
+          <div
+            class="${markerClass}"
+            style="--marker-color:${markerColor};"
+          >
+
+            ${
+              isMe && !isOffline
+                ? `
+                  <div class="victo-live-pulse"></div>
+                  <div class="victo-live-pulse pulse-delay"></div>
+                `
+                : ""
+            }
+
+            <div class="victo-live-avatar">
+              <img
+                src="${member.profileImage}"
+                alt=""
+              />
+            </div>
+
+            <div
+              class="victo-live-status"
+              style="
+                background:${
+                  member.online
+                    ? "#22c55e"
+                    : "#6b7280"
+                };
+              "
+            ></div>
+
+          </div>
+        `
+        : `
+          <div
+            class="victo-live-marker ${
+              isMe
+                ? "victo-live-marker-me"
+                : ""
+            }"
+            style="--marker-color:${markerColor};"
+          >
+
+            ${
+              isMe
+                ? `
+                  <div class="victo-live-pulse"></div>
+                  <div class="victo-live-pulse pulse-delay"></div>
+                `
+                : ""
+            }
+
+            <div
+              class="victo-live-avatar victo-live-avatar-emoji"
             >
-              <Popup>
+              ${getInitialAvatar(member.name)}
+            </div>
+
+            <div
+              class="victo-live-status"
+              style="
+                background:${
+                  member.online
+                    ? "#22c55e"
+                    : "#6b7280"
+                };
+              "
+            ></div>
+
+          </div>
+        `;
+
+      return (
+        <Marker
+          key={`member-${id}`}
+          position={[lat, lng]}
+          icon={divIcon({
+            className: "victo-member-marker",
+            html: avatarHtml,
+            iconSize: [58, 58],
+            iconAnchor: [29, 29],
+          })}
+        >
+          <Popup>
+            <div
+              style={{
+                minWidth: "120px",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                }}
+              >
+                <MemberAvatar
+                  member={member}
+                  size={30}
+                />
+
+                <div>
+                  <b>
+                    {member.name}
+                    {isMe ? " (You)" : ""}
+                  </b>
+
+                  <div
+                    style={{
+                      fontSize: "11px",
+                      color: member.online
+                        ? "#16a34a"
+                        : "#6b7280",
+                    }}
+                  >
+                    ●{" "}
+                    {member.online
+                      ? "Online"
+                      : "Offline"}
+                  </div>
+                </div>
+              </div>
+
+              <div
+                style={{
+                  marginTop: "6px",
+                  fontSize: "12px",
+                }}
+              >
+                Live Location
+              </div>
+
+              {member.destination && (
                 <div
                   style={{
-                    minWidth: "120px",
+                    marginTop: "5px",
+                    fontSize: "11px",
+                    color: "#6366f1",
                   }}
                 >
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "8px",
-                    }}
-                  >
-                    <MemberAvatar member={member} size={30} />
-
-                    <div>
-                      <b>
-                        {member.name}
-                        {isMe ? " (You)" : ""}
-                      </b>
-
-                      <div
-                        style={{
-                          fontSize: "11px",
-                          color: member.online ? "#16a34a" : "#6b7280",
-                        }}
-                      >
-                        ● {member.online ? "Online" : "Offline"}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div
-                    style={{
-                      marginTop: "6px",
-                      fontSize: "12px",
-                    }}
-                  >
-                    Live Location
-                  </div>
-
-                  {member.destination && (
-                    <div
-                      style={{
-                        marginTop: "5px",
-                        fontSize: "11px",
-                        color: "#6366f1",
-                      }}
-                    >
-                      📍 Destination set
-                    </div>
-                  )}
+                  📍 Destination set
                 </div>
-              </Popup>
-            </Marker>
-          );
-        })}
+              )}
+            </div>
+          </Popup>
+        </Marker>
+      );
+    },
+  )}
 
-            {/* SAVED DESTINATIONS */}
+  {/* ================================
+      SAVED DESTINATIONS
+  ================================= */}
 
-        {Object.entries(members).map(([id, member]) => {
-          if (!member.destination) {
-            return null;
-          }
+  {Object.entries(members).map(
+    ([id, member]) => {
+      if (!member.destination) {
+        return null;
+      }
 
-          return (
-            <DestinationMarker
-              key={`destination-${id}`}
-              id={id}
-              member={member}
-              memberId={memberId}
-              onRemove={removeDestination}
-            />
-          );
-        })}
+      return (
+        <DestinationMarker
+          key={`destination-${id}`}
+          id={id}
+          member={member}
+          memberId={memberId}
+          onRemove={removeDestination}
+        />
+      );
+    },
+  )}
 
-            {/* TEMPORARY DESTINATION */}
+  {/* ================================
+      TEMPORARY DESTINATION
+  ================================= */}
 
-        {selectedDestination && (
-          <Marker position={[selectedDestination.lat, selectedDestination.lng]}>
-            <Popup>
-              <b>New Destination</b>
-              <br />
-              Click <b>"Set Destination"</b> to save it.
-            </Popup>
-          </Marker>
-        )}
-      </MapContainer>
+  {selectedDestination && (
+    <Marker
+      position={[
+        selectedDestination.lat,
+        selectedDestination.lng,
+      ]}
+    >
+      <Popup>
+        <b>New Destination</b>
+        <br />
+        Click{" "}
+        <b>"Set Destination"</b> to save it.
+      </Popup>
+    </Marker>
+  )}
+</MapContainer>
     </div>
   );
 }

@@ -3190,3 +3190,20 @@ body {
     width: auto !important;
   }
 }
+
+
+/* Dark OpenStreetMap tiles */
+.leaflet-tile-pane {
+  filter: invert(100%) hue-rotate(180deg) brightness(65%) contrast(115%);
+}
+
+/* ========================================
+   VICto DARK MAP
+======================================== */
+
+.dark-map .leaflet-tile-pane {
+  filter: invert(100%)
+    hue-rotate(180deg)
+    brightness(65%)
+    contrast(115%);
+}
