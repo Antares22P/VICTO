@@ -3194,3 +3194,14 @@ body {
   }
 }
 
+/* =========================================
+   VICTO DARK MONOCHROME MAP
+   ========================================= */
+
+.room-app:not(.satellite-mode) .leaflet-tile-pane {
+  filter:
+    grayscale(100%)
+    invert(100%)
+    brightness(145%)
+    contrast(75%);
+}
