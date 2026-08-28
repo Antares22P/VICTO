@@ -1542,13 +1542,17 @@ function Room() {
             {/* DARK MAP */}
 
         <TileLayer
-          attribution={satelliteMode ? "&copy; Esri" : "&copy; Carto"}
-          url={
-            satelliteMode
-              ? "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-              : "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-          }
-        />
+  attribution={
+    satelliteMode
+      ? "&copy; Esri"
+      : '&copy; OpenStreetMap contributors &copy; Stadia Maps'
+  }
+  url={
+    satelliteMode
+      ? "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+      : "https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png"
+  }
+/>
 
             {/* MAP CLICK  */}
 
