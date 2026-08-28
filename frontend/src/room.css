@@ -3202,9 +3202,8 @@ body {
 ======================================== */
 
 .dark-map .leaflet-tile-pane {
-  filter: invert(100%)
-    hue-rotate(180deg)
+  filter:
     grayscale(100%)
-    brightness(78%)
-    contrast(120%);
+    brightness(105%)
+    contrast(130%);
 }
